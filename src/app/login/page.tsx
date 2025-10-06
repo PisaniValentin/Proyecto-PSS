@@ -1,9 +1,6 @@
 'use client';
 
 import Link from "next/link";
-import Google from "../ui/Icons/googleIcon";
-import Facebook from "../ui/Icons/facebookIcon";
-import Apple from "../ui/Icons/appleIcon";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -44,7 +41,7 @@ export default function Page() {
   return (
     <form onSubmit={handleSubmit} className="flex items-center justify-center h-max">
       <div className="p-10 flex flex-col gap-1">
-        <h1 className="font-bold bg-[linear-gradient(90deg,_#14A9FE,_#B83DD6)] bg-clip-text text-transparent text-4xl self-center">Sign In</h1>
+        <h1 className="font-bold text-white text-4xl self-center">Sign In</h1>
         <h2 className="text-gray-300 text-xl self-center mb-4">Hi! Welcome, you've been missed</h2>
         <label className="text-md font-bold" htmlFor="email">Email: </label>
         <div className="border-gradient input-border mb-4">
@@ -73,24 +70,6 @@ export default function Page() {
           )}
         </div>
 
-        <h3 className="self-center text-gray-400 mb-4">Or sign in with</h3>
-        <ul className="flex justify-around mb-10">
-          <li>
-            <a href="">
-              <Google width={56} height={56} />
-            </a>
-          </li>
-          <li>
-            <a href="">
-              <Facebook width={56} height={56} />
-            </a>
-          </li>
-          <li>
-            <a href="">
-              <Apple width={56} height={56} />
-            </a>
-          </li>
-        </ul>
         <h5 className="text-gray-300 text-center">
           Don't have an account?
           <Link href={""} className="pl-2 text-white underline">Sign Up</Link>

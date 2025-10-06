@@ -30,12 +30,11 @@
 
   .border-gradient {
     padding: 1px;
-    background: linear-gradient(180deg, #14A9FE, #B83DD6);
-    border-radius: 20px;
+    background: linear-gradient(180deg, #d1d1d1, #323232);
+    border-radius: 5px;
   }
 
   .border-gradient-body {
     background-color: black;
-    border-radius: 20px;
-
+    border-radius: 5px;
   }

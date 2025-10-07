@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -8,7 +8,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 export default function Page() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
 
@@ -39,23 +39,43 @@ export default function Page() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center justify-center h-max">
+    <form
+      onSubmit={handleSubmit}
+      className="flex items-center justify-center h-max"
+    >
       <div className="p-10 flex flex-col gap-1">
-        <h1 className="font-bold text-white text-4xl self-center">Sign In</h1>
-        <h2 className="text-gray-300 text-xl self-center mb-4">Hi! Welcome, you've been missed</h2>
-        <label className="text-md font-bold" htmlFor="email">Email: </label>
-        <div className="border-gradient input-border mb-4">
-          <input className="border-gradient-body w-full p-1 pl-4" name="email" type="email" id="email" placeholder="something@gmail.com" />
+        <h1 className="font-bold  text-4xl self-center">Sign In</h1>
+        <h2 className=" text-xl self-center mb-4">Hola! Bienvenido</h2>
+        <label className="text-md font-bold" htmlFor="email">
+          Email:{" "}
+        </label>
+        <div className="border-1 rounded-[20px] input-border mb-4">
+          <input
+            className=" w-full p-1 pl-4"
+            name="email"
+            type="email"
+            id="email"
+            placeholder="something@gmail.com"
+          />
         </div>
-        <label className="text-md font-bold" htmlFor="password">Password: </label>
-        <div className="input-border mb-4 border-gradient">
-          <input className="border-gradient-body w-full p-1 pl-4" name="password" type="password" id="password" placeholder="Password" />
+        <label className="text-md font-bold" htmlFor="contraseña">
+          Contraseña:{" "}
+        </label>
+        <div className="border-1 rounded-[20px] mb-4 border-gradient">
+          <input
+            className=" w-full p-1 pl-4"
+            name="contraseña"
+            type="password"
+            id="contraseña"
+            placeholder="Contraseña"
+          />
         </div>
 
-        <button className="border-gradient w-1/2 text-center self-center mb-4" aria-disabled={isPending}>
-          <div className="border-gradient-body">
-            Log in
-          </div>
+        <button
+          className="border-1 rounded-[20px] bg-[#01161E] text-[#EFF6E0] w-1/2 text-center self-center mb-4"
+          aria-disabled={isPending}
+        >
+          <div className="">Log in</div>
         </button>
         <div
           className="flex h-8 items-end space-x-1"
@@ -70,9 +90,11 @@ export default function Page() {
           )}
         </div>
 
-        <h5 className="text-gray-300 text-center">
-          Don't have an account?
-          <Link href={""} className="pl-2 text-white underline">Sign Up</Link>
+        <h5 className=" text-center">
+          No tienes cuenta?
+          <Link href={""} className="pl-2  underline">
+            Registrate
+          </Link>
         </h5>
       </div>
     </form>

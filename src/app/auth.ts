@@ -29,17 +29,17 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           const { dni, password } = parsedCredentials.data;
           const user = await getUser(dni);
           if (!user || !user.password) return null;
-
+          
           if(password !== user.password) return null
           // Descomentar para utilizar las claves encriptadas en produccion.
           // const passwordsMatch = await bcrypt.compare(password, user.password);
           // if (!passwordsMatch) return null;
           return {
             id: user.id.toString(),
+            dni: user.dni,
             email: user.email,
             name: user.nombre,
-            rol: user.rol,
-            userId: user.id.toString(),
+            rol: user.rol
           };
         }
         return null;

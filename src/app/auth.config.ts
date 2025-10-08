@@ -33,6 +33,7 @@ export const authConfig = {
       if (user) {
         token.rol = user.rol
         token.id = user.id?.toString();
+        token.dni = user.dni
       }
       return token
     },
@@ -41,6 +42,7 @@ export const authConfig = {
         ...session.user,
         id: (token.id ?? token.sub) as string,
         rol: token.rol,
+        dni: token.dni,
       };
       return session;
     },

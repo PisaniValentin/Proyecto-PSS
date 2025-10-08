@@ -66,8 +66,9 @@ export async function PUT(req: NextRequest, context: { params: { id: string } })
     }
 }
 
-export async function DELETE(context: { params: { id: string } }) {
-    const usuarioId = Number(context.params.id);
+export async function DELETE(_req: NextRequest, context: { params: { id: string } }) {
+    const { id } = await context.params;
+    const usuarioId = Number(id);
 
     if (!usuarioId || isNaN(usuarioId)) {
         return NextResponse.json({ error: 'Falta o es inválido el id del usuario' }, { status: 400 })

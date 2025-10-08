@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { Rol, TipoPlan, EstadoSocio } from "@prisma/client";
 
 export async function GET(
-    req: Request,
+    _req: NextRequest,
     { params }: { params: { dni: string } }
 ) {
     try {
@@ -37,7 +37,7 @@ export async function GET(
 }
 
 export async function PUT(
-    req: Request,
+    req: NextRequest,
     { params }: { params: { dni: string } }
 ) {
     try {
@@ -120,12 +120,15 @@ export async function PUT(
 }
 
 export async function DELETE(
-    req: Request,
-    { params }: { params: { dni: string } }
+    _req: NextRequest,
+    context: { params: { dni: string } }
 ) {
+
+    const { dni } = await context.params;
+
     try {
         const socio = await prisma.socio.findFirst({
-            where: { usuario: { dni: params.dni } },
+            where: { usuario: { dni: dni } },
             include: { usuario: true },
         });
 

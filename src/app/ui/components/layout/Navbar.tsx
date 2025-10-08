@@ -1,6 +1,9 @@
 "use client";
 
 import { AppBar, Toolbar, Typography, Button } from "@mui/material";
+import LogoutIcon from '@mui/icons-material/Logout';
+import PoolIcon from '@mui/icons-material/Pool';
+
 
 export default function Navbar() {
   return (
@@ -13,10 +16,10 @@ export default function Navbar() {
     >
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'white' }}>
-          Club Deportivo - Panel Admin
+          <PoolIcon />  Bahía Blanca Club
         </Typography>
-        <Button color="inherit" sx={{ fontWeight: 'bold' }}>Logout</Button>
+        <Button color="inherit" sx={{ fontWeight: 'bold' }}><LogoutIcon /></Button>
       </Toolbar>
-    </AppBar>
+    </AppBar >
   );
 }

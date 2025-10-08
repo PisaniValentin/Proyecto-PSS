@@ -10,12 +10,12 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Link from "next/link";
 
 const secciones = [
-  { nombre: "Prácticas Deportivas", icon: <SportsSoccerIcon /> },
-  { nombre: "Alquileres", icon: <SportsBasketballIcon /> },
-  { nombre: "Gestión de Cuentas", icon: <AccountCircleIcon /> },
-  { nombre: "Reportes", icon: <ReceiptIcon /> },
-  { nombre: "Pagos", icon: <PaymentIcon /> },
-  { nombre: "Otro", icon: <MoreHorizIcon /> },
+  { nombre: "Prácticas Deportivas", path: "practicas", icon: <SportsSoccerIcon /> },
+  { nombre: "Alquileres", path: "alquileres", icon: <SportsBasketballIcon /> },
+  { nombre: "Gestión de Cuentas", path: "cuentas", icon: <AccountCircleIcon /> },
+  { nombre: "Reportes", path: "reportes", icon: <ReceiptIcon /> },
+  { nombre: "Pagos", path: "pagos", icon: <PaymentIcon /> },
+  { nombre: "Otro", path: "otros", icon: <MoreHorizIcon /> },
 ];
 
 export default function Sidebar() {
@@ -37,7 +37,7 @@ export default function Sidebar() {
           <ListItemButton
             key={sec.nombre}
             component={Link}
-            href={`/admin/${sec.nombre.toLowerCase().replace(/\s+/g, '-')}`}
+            href={`/admin/${sec.path}`}
             sx={{
               mb: 1,
               borderRadius: 2,

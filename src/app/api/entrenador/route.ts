@@ -35,18 +35,18 @@ export async function POST(req: Request) {
             );
         }
 
-        const practica = await prisma.practicaDeportiva.findUnique({
-            where: { id: practicaId },
-        });
-        if (!practica) {
-            return NextResponse.json({ error: "La práctica especificada no existe" }, { status: 400 });
-        }
+        // const practica = await prisma.practicaDeportiva.findUnique({
+        //     where: { id: practicaId },
+        // });
+        // if (!practica) {
+        //     return NextResponse.json({ error: "La práctica especificada no existe" }, { status: 400 });
+        // }
 
         //const hashedPassword = await bcrypt.hash(password, 10);
 
         const nuevoEntrenador = await prisma.entrenador.create({
             data: {
-                practica: { connect: { id: practicaId } },
+                // practica: { connect: { id: practicaId } },
                 usuario: {
                     create: {
                         nombre,
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
             },
             include: {
                 usuario: true,
-                practica: true,
+                // practica: true,
             },
         });
 

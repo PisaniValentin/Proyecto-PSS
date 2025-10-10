@@ -60,11 +60,11 @@ model Usuario {
 
 model Entrenador {
     id         Int @id @default(autoincrement())
-    usuarioId  Int @unique
-    practicaId Int
+    usuarioDni  String @unique
+    practicaId Int?
 
-    usuario     Usuario           @relation(fields: [usuarioId], references: [id])
-    practica    PracticaDeportiva @relation(fields: [practicaId], references: [id])
+    usuario     Usuario           @relation(fields: [usuarioDni], references: [dni])
+    practica    PracticaDeportiva? @relation(fields: [practicaId], references: [id])
     asistencias Asistencia[]
 }
 

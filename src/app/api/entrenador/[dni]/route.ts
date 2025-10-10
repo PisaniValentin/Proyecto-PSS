@@ -4,13 +4,18 @@ import { Rol } from "@prisma/client";
 
 export async function GET(
     req: Request,
-    { params }: { params: { dni: string } }
+    context: { params: { dni: string } }
 ) {
+    const dni = context.params.dni;
     try {
-        const entrenador = await prisma.entrenador.findFirst({
-            where: { usuario: { dni: params.dni } },
+        // const entrenador = await prisma.entrenador.findFirst({
+        //     where: { usuario: { dni: params.dni } },
+        //     include: { usuario: true, practica: true },
+        // });
+        const entrenador = await prisma.entrenador.findUnique({
+            where: { usuarioDni: dni },
             include: { usuario: true, practica: true },
-        });
+});
 
         if (!entrenador) {
             return NextResponse.json(
@@ -113,7 +118,7 @@ export async function DELETE(
         }
 
         await prisma.entrenador.delete({ where: { id: entrenador.id } });
-        await prisma.usuario.delete({ where: { id: entrenador.usuarioId } });
+        // await prisma.usuario.delete({ where: { id: entrenador.usuarioId } });
 
         return NextResponse.json({ message: "Entrenador eliminado correctamente" });
     } catch (error) {

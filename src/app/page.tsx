@@ -1,22 +1,14 @@
 "use client";
 
-import { Box, Typography, TextField, Button, Paper } from "@mui/material";
+import { Typography } from "@mui/material";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { signIn, getSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function HomePage() {
-  // const [dni, setDni] = useState("");
-  // const [password, setPassword] = useState("");
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const [isPending, setIsPending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
-
-  // const handleLogin = () => {
-  //   alert(`DNI: ${dni}\nContraseña: ${password}`);
-  // };
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -35,11 +27,23 @@ export default function HomePage() {
 
     setIsPending(false);
 
+    const updatedSession = await getSession();
+
     if (res?.error) {
       setErrorMessage("Invalid credentials.");
     } else if (res?.ok) {
       router.refresh();
-      router.push(res.url || "/");
+      if (updatedSession?.user?.rol === "ADMIN") {
+        router.push("/admin");
+      } else {
+        if (updatedSession?.user?.rol === "ENTRENADOR") {
+          router.push("/entrenador");
+        } else {
+          if (updatedSession?.user?.rol === "SOCIO") {
+            router.push("/socio");
+          }
+        }
+      }
     }
   }
 
@@ -98,32 +102,6 @@ export default function HomePage() {
               )}
             </div>
           </form>
-
-          {/* <Box className="flex flex-col gap-4">
-            <TextField
-              label="DNI"
-              variant="outlined"
-              value={dni}
-              onChange={(e) => setDni(e.target.value)}
-              fullWidth
-            />
-            <TextField
-              label="Contraseña"
-              type="password"
-              variant="outlined"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleLogin}
-              fullWidth
-            >
-              Ingresar
-            </Button>
-          </Box> */}
         </div>
       </div>
 

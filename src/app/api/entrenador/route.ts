@@ -21,7 +21,7 @@ export async function POST(req: Request) {
         const data = await req.json();
         const { nombre, apellido, dni, email, telefono, password, practicaId } = data;
 
-        if (!nombre || !apellido || !dni || !email || !password || !practicaId) {
+        if (!nombre || !apellido || !dni || !email || !password) {
             return NextResponse.json({ error: "Faltan datos obligatorios" }, { status: 400 });
         }
 

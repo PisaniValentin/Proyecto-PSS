@@ -73,6 +73,18 @@ export async function middleware(request: NextRequest) {
       }
   }}
 
+  if (pathname.startsWith("/socio")) {
+    if (!session) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+    if (session.user?.rol === "ADMIN") {
+      return NextResponse.redirect(new URL("/admin", request.url));
+    }else{
+      if (session.user?.rol === "ENTRENADOR") {
+        return NextResponse.redirect(new URL("/entrenador", request.url));
+      }
+  }}
+
   // // Bloquear /cart si no logueado o rol no CLIENTE
   // if (pathname.startsWith("/cart")) {
   //   if (!session) {

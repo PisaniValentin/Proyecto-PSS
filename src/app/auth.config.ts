@@ -14,17 +14,17 @@ export const authConfig = {
 
       const isOnAdmin = nextUrl.pathname.startsWith('/admin');
 
-      const isClientProtectedRoute = ['/cart','/profile'].some(path =>
-        nextUrl.pathname.startsWith(path)
-      );
+      // const isClientProtectedRoute = ['/cart','/profile'].some(path =>
+      //   nextUrl.pathname.startsWith(path)
+      // );
 
       if (isOnAdmin) {
         return isLoggedIn && user?.rol === 'ADMIN';
       }
 
-      if (isClientProtectedRoute) {
-        return (isLoggedIn && user?.rol === 'ENTRENADOR');
-      }
+      // if (isClientProtectedRoute) {
+      //   return (isLoggedIn && user?.rol === 'ENTRENADOR');
+      // }
 
       return true;
     },

@@ -31,18 +31,26 @@ export default function GestionEntidad({ tipo }: GestionEntidadProps) {
 
   const handleClose = () => setModal(null);
 
-  // Simulación de búsqueda por DNI
-  const buscarUsuario = () => {
-    if (dniInput === "12345678") {
-      setUsuarioEncontrado({
-        nombre: "Juan",
-        apellido: "Pérez",
-        email: "juan@example.com",
-        dni: dniInput,
-      });
+  const buscarUsuario = async () => {
+    const res = await fetch(`/api/usuario/${dniInput}`);
+    const data = await res.json();
+
+    if (res.ok) {
+      setUsuarioEncontrado(data);
     } else {
       setModalError(true);
     }
+    // Simulación de búsqueda por DNI
+    // if (dniInput === "12345678") {
+    //   setUsuarioEncontrado({
+    //     nombre: "Juan",
+    //     apellido: "Pérez",
+    //     email: "juan@example.com",
+    //     dni: dniInput,
+    //   });
+    // } else {
+    //   setModalError(true);
+    // }
   };
 
   const guardarCambios = () => {

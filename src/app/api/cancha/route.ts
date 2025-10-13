@@ -1,67 +1,62 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
-import { TipoDeporte } from "@prisma/client";
+import { TipoDeporte } from "@prisma/client"; // 👈 ahora existe
 
-export async function GET() {
-    try {
-        const canchas = await prisma.cancha.findMany({
-            include: {
-                horarios: true,
-                TurnoCancha: true,
-            },
-        });
-
-        return NextResponse.json(canchas, { status: 200 });
-    } catch (error) {
-        console.error(error);
-        return NextResponse.json(
-            { error: "Error al obtener las canchas" },
-            { status: 500 }
-        );
-    }
+// GET /api/cancha
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const all = searchParams.get("all") === "1";
+    const canchas = await prisma.cancha.findMany({
+      where: all ? {} : { activa: true },
+      orderBy: { id: "asc" },
+    });
+    return NextResponse.json(canchas, { status: 200 });
+  } catch (error: any) {
+    console.error("GET /api/cancha ->", error);
+    return NextResponse.json({ error: "Error al obtener las canchas" }, { status: 500 });
+  }
 }
 
+// POST /api/cancha
 export async function POST(req: Request) {
-    try {
-        const data = await req.json();
-        const {
-            nombre,
-            tipoDeporte,
-            interior,
-            capacidadMax,
-            precioHora,
-        } = data;
+  try {
+    const body = await req.json();
+    const { nombre, tipoDeporte, interior, capacidadMax, precioHora } = body;
 
-        if (!nombre || !tipoDeporte || !interior || !capacidadMax || !precioHora) {
-            return NextResponse.json(
-                { error: "Faltan campos obligatorios" },
-                { status: 400 }
-            );
-        }
-
-        if (!Object.values(TipoDeporte).includes(tipoDeporte)) {
-            return NextResponse.json(
-                { error: "Tipo de deporte inválido" },
-                { status: 400 }
-            );
-        }
-
-        const nuevaCancha = await prisma.cancha.create({
-            data: {
-                nombre,
-                tipoDeporte: tipoDeporte as TipoDeporte,
-                interior: Boolean(interior),
-                capacidadMax: Number(capacidadMax),
-                precioHora: Number(precioHora),
-            },
-        });
-
-        return NextResponse.json(nuevaCancha, { status: 201 });
-    } catch (error) {
-        console.error(error);
-        return NextResponse.json(
-            { error: "Error al crear el cancha" },
-            { status: 500 }
-        );
+    if (
+      !nombre ||
+      !tipoDeporte ||
+      interior === undefined ||
+      capacidadMax === undefined ||
+      precioHora === undefined
+    ) {
+      return NextResponse.json({ error: "Faltan campos obligatorios" }, { status: 400 });
     }
+
+    // validar y mapear al enum
+    const deporte = String(tipoDeporte).toUpperCase() as keyof typeof TipoDeporte;
+    if (!TipoDeporte[deporte]) {
+      return NextResponse.json({ error: "Tipo de deporte inválido" }, { status: 400 });
+    }
+
+    const nueva = await prisma.cancha.create({
+      data: {
+        nombre: String(nombre),
+        tipoDeporte: TipoDeporte[deporte], // 
+        interior: Boolean(interior),
+        capacidadMax: Number(capacidadMax),
+        precioHora: Number(precioHora),
+        activa: true,
+      },
+    });
+
+    return NextResponse.json(nueva, { status: 201 });
+  } catch (error: any) {
+    console.error("POST /api/cancha ->", error);
+    return NextResponse.json(
+      { error: "Error al crear la cancha", details: error?.message },
+      { status: 500 }
+    );
+  }
 }

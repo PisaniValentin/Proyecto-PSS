@@ -1,264 +1,268 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "sqlite"
-    url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 enum Rol {
-    ADMIN
-    ENTRENADOR
-    SOCIO
+  ADMIN
+  ENTRENADOR
+  SOCIO
 }
 
 enum TipoPlan {
-    INDIVIDUAL
-    FAMILIAR
+  INDIVIDUAL
+  FAMILIAR
 }
 
 enum EstadoAlquiler {
-    RESERVADO
-    CANCELADO
-    COMPLETADO
+  RESERVADO
+  CANCELADO
+  COMPLETADO
 }
 
 enum EstadoSocio {
-    ACTIVO
-    INACTIVO
-    BLOQUEADO
+  ACTIVO
+  INACTIVO
+  BLOQUEADO
 }
 
 enum TipoDeporte {
-    FUTBOL
-    BASQUET
-    NATACION
-    HANDBALL
+  FUTBOL
+  BASQUET
+  NATACION
+  HANDBALL
 }
 
 enum TipoPago {
-    CUOTA_SOCIO
-    PRACTICA_DEPORTIVA
-    ALQUILER
+  CUOTA_SOCIO
+  PRACTICA_DEPORTIVA
+  ALQUILER
 }
 
 model Usuario {
-    id        Int      @id @default(autoincrement())
-    nombre    String
-    apellido  String
-    dni       String   @unique
-    email     String   @unique
-    telefono  String?
-    password  String
-    rol       Rol
-    fechaAlta DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  nombre    String
+  apellido  String
+  dni       String   @unique
+  email     String   @unique
+  telefono  String?
+  password  String
+  rol       Rol
+  fechaAlta DateTime @default(now())
 
-    entrenador Entrenador?
-    socio      Socio?
+  entrenador Entrenador?
+  socio      Socio?
 }
 
 model Entrenador {
-    id         Int @id @default(autoincrement())
-    usuarioDni  String @unique
-    practicaId Int?
+  id          Int    @id @default(autoincrement())
+  usuarioDni  String @unique
+  practicaId  Int?
 
-    usuario     Usuario           @relation(fields: [usuarioDni], references: [dni])
-    practica    PracticaDeportiva? @relation(fields: [practicaId], references: [id])
-    asistencias Asistencia[]
+  usuario     Usuario            @relation(fields: [usuarioDni], references: [dni])
+  practica    PracticaDeportiva? @relation(fields: [practicaId], references: [id])
+  asistencias Asistencia[]
 }
 
 model Socio {
-    id        Int         @id @default(autoincrement())
-    usuarioId Int         @unique
-    tipoPlan  TipoPlan
-    familiaId Int?
-    estado    EstadoSocio @default(ACTIVO)
+  id        Int         @id @default(autoincrement())
+  usuarioId Int         @unique
+  tipoPlan  TipoPlan
+  familiaId Int?
+  estado    EstadoSocio @default(ACTIVO)
 
-    usuario       Usuario                @relation(fields: [usuarioId], references: [id])
-    familia       Familia?               @relation(fields: [familiaId], references: [id])
-    inscripciones InscripcionDeportiva[]
-    alquileres    AlquilerCancha[]
-    asistencias   Asistencia[]
-    pagos         Pago[]
-    CuotaSocio    CuotaSocio[]
+  usuario       Usuario                @relation(fields: [usuarioId], references: [id])
+  familia       Familia?               @relation(fields: [familiaId], references: [id])
+  inscripciones InscripcionDeportiva[]
+  alquileres    AlquilerCancha[]
+  asistencias   Asistencia[]
+  pagos         Pago[]
+  CuotaSocio    CuotaSocio[]
 }
 
 model Familia {
-    id        Int    @id @default(autoincrement())
-    apellido  String
-    descuento Float  @default(0.3)
-    // Nota: Validar en app que socios.length >= 3 para aplicar descuento
+  id        Int    @id @default(autoincrement())
+  apellido  String
+  descuento Float  @default(0.3)
 
-    socios Socio[]
+  socios Socio[]
 }
 
 model PracticaDeportiva {
-    id      Int         @id @default(autoincrement())
-    deporte TipoDeporte
-    precio  Float
+  id      Int         @id @default(autoincrement())
+  deporte TipoDeporte
+  precio  Float
 
-    inscripciones InscripcionDeportiva[]
-    asistencia    Asistencia[]
-    entrenadores  Entrenador[]
-    horarios      HorarioPractica[]
+  inscripciones InscripcionDeportiva[]
+  asistencia    Asistencia[]
+  entrenadores  Entrenador[]
+  horarios      HorarioPractica[]
 }
 
 model HorarioPractica {
-    id         Int       @id @default(autoincrement())
-    practicaId Int
-    fecha      DateTime?
-    horaInicio DateTime
-    horaFin    DateTime
-    turnoId    Int?
+  id         Int       @id @default(autoincrement())
+  practicaId Int
+  fecha      DateTime?
+  horaInicio DateTime
+  horaFin    DateTime
+  turnoId    Int?
 
-    practica PracticaDeportiva @relation(fields: [practicaId], references: [id])
-    turno    TurnoCancha?      @relation(fields: [turnoId], references: [id])
+  practica PracticaDeportiva @relation(fields: [practicaId], references: [id])
+  turno    TurnoCancha?      @relation(fields: [turnoId], references: [id])
 }
 
 model TurnoCancha {
-    id         Int      @id @default(autoincrement())
-    canchaId   Int
-    fecha      DateTime
-    horaInicio DateTime
-    horaFin    DateTime
-    disponible Boolean  @default(true)
+  id         Int      @id @default(autoincrement())
+  canchaId   Int
+  fecha      DateTime
+  horaInicio DateTime
+  horaFin    DateTime
+  disponible Boolean  @default(true)
 
-    cancha          Cancha            @relation(fields: [canchaId], references: [id])
-    alquiler        AlquilerCancha[]
-    HorarioPractica HorarioPractica[]
+  cancha          Cancha            @relation(fields: [canchaId], references: [id])
+  alquiler        AlquilerCancha[]
+  HorarioPractica HorarioPractica[]
 }
 
 model InscripcionDeportiva {
-    id               Int      @id @default(autoincrement())
-    socioId          Int
-    practicaId       Int
-    fechaInscripcion DateTime @default(now())
-    precioPagado     Float
+  id               Int      @id @default(autoincrement())
+  socioId          Int
+  practicaId       Int
+  fechaInscripcion DateTime @default(now())
+  precioPagado     Float
 
-    socio    Socio             @relation(fields: [socioId], references: [id])
-    practica PracticaDeportiva @relation(fields: [practicaId], references: [id])
+  socio    Socio             @relation(fields: [socioId], references: [id])
+  practica PracticaDeportiva @relation(fields: [practicaId], references: [id])
 }
 
 model Cancha {
-    id           Int         @id @default(autoincrement())
-    nombre       String
-    tipoDeporte  TipoDeporte
-    interior     Boolean
-    capacidadMax Int
-    precioHora   Float
-    activa       Boolean     @default(true)
+  id           Int         @id @default(autoincrement())
+  nombre       String
+  tipoDeporte  TipoDeporte
+  interior     Boolean
+  capacidadMax Int
+  precioHora   Float
+  activa       Boolean     @default(true)
 
-    horarios    HorarioCancha[]
-    TurnoCancha TurnoCancha[]
+  //  NUEVO para F6.1 (Alta Cancha)
+  dia          DiaSemana
+  horaApertura String      // "HH:mm"
+  horaCierre   String      // "HH:mm"
+
+  horarios     HorarioCancha[]
+  TurnoCancha  TurnoCancha[]
 }
 
 model HorarioCancha {
-    id         Int       @id @default(autoincrement())
-    canchaId   Int
-    diaSemana  DiaSemana
-    horaInicio DateTime
-    horaFin    DateTime
-    disponible Boolean   @default(true)
+  id         Int       @id @default(autoincrement())
+  canchaId   Int
+  diaSemana  DiaSemana
+  horaInicio DateTime
+  horaFin    DateTime
+  disponible Boolean   @default(true)
 
-    cancha Cancha @relation(fields: [canchaId], references: [id])
+  cancha Cancha @relation(fields: [canchaId], references: [id])
 }
 
 model AlquilerCancha {
-    id                Int            @id @default(autoincrement())
-    socioId           Int
-    turnoId           Int
-    fechaReserva      DateTime       @default(now())
-    estadoAlquiler    EstadoAlquiler
-    motivoCancelacion Motivo?
-    fechaCancelacion  DateTime?
-    notificado        Boolean        @default(false)
+  id                Int            @id @default(autoincrement())
+  socioId           Int
+  turnoId           Int
+  fechaReserva      DateTime       @default(now())
+  estadoAlquiler    EstadoAlquiler
+  motivoCancelacion Motivo?
+  fechaCancelacion  DateTime?
+  notificado        Boolean        @default(false)
 
-    socio  Socio       @relation(fields: [socioId], references: [id])
-    turno  TurnoCancha @relation(fields: [turnoId], references: [id])
-    pago   Pago?       @relation(fields: [pagoId], references: [id])
-    pagoId Int?
+  socio  Socio       @relation(fields: [socioId], references: [id])
+  turno  TurnoCancha @relation(fields: [turnoId], references: [id])
+  pago   Pago?       @relation(fields: [pagoId], references: [id])
+  pagoId Int?
 }
 
 model Asistencia {
-    id           Int      @id @default(autoincrement())
-    socioId      Int
-    entrenadorId Int
-    practicaId   Int
-    fecha        DateTime @default(now())
-    presente     Boolean
+  id           Int      @id @default(autoincrement())
+  socioId      Int
+  entrenadorId Int
+  practicaId   Int
+  fecha        DateTime @default(now())
+  presente     Boolean
 
-    socio      Socio             @relation(fields: [socioId], references: [id])
-    entrenador Entrenador        @relation(fields: [entrenadorId], references: [id])
-    practica   PracticaDeportiva @relation(fields: [practicaId], references: [id])
+  socio      Socio             @relation(fields: [socioId], references: [id])
+  entrenador Entrenador        @relation(fields: [entrenadorId], references: [id])
+  practica   PracticaDeportiva @relation(fields: [practicaId], references: [id])
 }
 
 model Pago {
-    id        Int      @id @default(autoincrement())
-    socioId   Int
-    monto     Float
-    tipo      TipoPago
-    fechaPago DateTime @default(now())
-    aprobado  Boolean  @default(false)
+  id        Int      @id @default(autoincrement())
+  socioId   Int
+  monto     Float
+  tipo      TipoPago
+  fechaPago DateTime @default(now())
+  aprobado  Boolean  @default(false)
 
-    comprobante    ComprobantePago?
-    socio          Socio            @relation(fields: [socioId], references: [id])
-    AlquilerCancha AlquilerCancha[]
-    CuotaSocio     CuotaSocio[]
+  comprobante    ComprobantePago?
+  socio          Socio            @relation(fields: [socioId], references: [id])
+  AlquilerCancha AlquilerCancha[]
+  CuotaSocio     CuotaSocio[]
 }
 
 model ComprobantePago {
-    id          Int      @id @default(autoincrement())
-    pagoId      Int      @unique
-    archivoUrl  String
-    fechaSubida DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  pagoId      Int      @unique
+  archivoUrl  String
+  fechaSubida DateTime @default(now())
 
-    pago Pago @relation(fields: [pagoId], references: [id])
+  pago Pago @relation(fields: [pagoId], references: [id])
 }
 
 model CuotaSocio {
-    id        Int       @id @default(autoincrement())
-    socioId   Int
-    mes       Meses
-    anio      Int
-    monto     Float
-    pagada    Boolean   @default(false)
-    fechaPago DateTime?
+  id        Int       @id @default(autoincrement())
+  socioId   Int
+  mes       Meses
+  anio      Int
+  monto     Float
+  pagada    Boolean   @default(false)
+  fechaPago DateTime?
 
-    socio  Socio @relation(fields: [socioId], references: [id])
-    pago   Pago? @relation(fields: [pagoId], references: [id])
-    pagoId Int?
+  socio  Socio @relation(fields: [socioId], references: [id])
+  pago   Pago? @relation(fields: [pagoId], references: [id])
+  pagoId Int?
 }
 
 enum Meses {
-    ENERO
-    FEBRERO
-    MARZO
-    ABRIL
-    MAYO
-    JUNIO
-    JULIO
-    AGOSTO
-    SEPTIEMBRE
-    OCTUBRE
-    NOVIEMBRE
-    DICIEMBRE
+  ENERO
+  FEBRERO
+  MARZO
+  ABRIL
+  MAYO
+  JUNIO
+  JULIO
+  AGOSTO
+  SEPTIEMBRE
+  OCTUBRE
+  NOVIEMBRE
+  DICIEMBRE
 }
 
 enum DiaSemana {
-    LUNES
-    MARTES
-    MIERCOLES
-    JUEVES
-    VIERNES
-    SABADO
-    DOMINGO
+  LUNES
+  MARTES
+  MIERCOLES
+  JUEVES
+  VIERNES
+  SABADO
+  DOMINGO
 }
 
 enum Motivo {
-    MANTENIMIENTO
-    LLUVIA
-    CORTE_DE_LUZ
-    CORTE_DE_AGUA
-    PROBLEMAS_CALEFACCION
+  MANTENIMIENTO
+  LLUVIA
+  CORTE_DE_LUZ
+  CORTE_DE_AGUA
+  PROBLEMAS_CALEFACCION
 }

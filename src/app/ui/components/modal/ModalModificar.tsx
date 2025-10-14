@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import {
     Dialog,
     DialogTitle,
@@ -30,6 +30,63 @@ export default function ModalModificar({
     tipo,
     practicasDisponibles = [],
 }: ModalModificarProps) {
+
+    const [loading, setLoading] = useState(false);
+
+    const Guardar = async () => {
+        setLoading(true);
+
+        try {
+            let endpoint = "";
+            const dni = usuario.dni;
+            if (tipo === "Administrativo") {
+                endpoint = `/api/usuario/${dni}`;
+            } else if (tipo === "Entrenador") {
+                endpoint = `/api/entrenador/${dni}`;
+            } else if (tipo === "Socio") {
+                endpoint = `/api/socio/${dni}`;
+            } else {
+                console.error("Tipo de usuario no soportado");
+                setLoading(false);
+                return;
+            }
+
+            const body: any = {
+                nombre: usuario.nombre,
+                apellido: usuario.apellido,
+                email: usuario.email,
+                telefono: usuario.telefono,
+            };
+
+            // Campos específicos por tipo
+            if (tipo === "Entrenador") {
+                body.practicaId = usuario.practicaId || null;
+            } else if (tipo === "Socio") {
+                body.tipoPlan = usuario.tipoPlan;
+                body.estado = usuario.estado;
+            }
+
+            const res = await fetch(endpoint, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                console.error(data.error || "Error al actualizar usuario");
+                setLoading(false);
+                return;
+            }
+
+            onGuardar()
+        } catch (error) {
+            console.error("Error al guardar cambios:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle>Modificar {tipo}</DialogTitle>
@@ -126,8 +183,8 @@ export default function ModalModificar({
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Cancelar</Button>
-                <Button variant="contained" color="secondary" onClick={onGuardar}>
-                    Guardar Cambios
+                <Button variant="contained" color="secondary" onClick={Guardar} disabled={loading}>
+                    {loading ? "Guardando..." : "Guardar Cambios"}
                 </Button>
             </DialogActions>
         </Dialog>

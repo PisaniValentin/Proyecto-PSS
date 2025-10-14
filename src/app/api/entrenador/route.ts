@@ -25,6 +25,18 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Faltan datos obligatorios" }, { status: 400 });
         }
 
+        if (practicaId) {
+            const practica = await prisma.practicaDeportiva.findUnique({
+                where: { id: practicaId },
+            });
+            if (!practica) {
+                return NextResponse.json(
+                    { error: "Practica Deportiva no encontrada" },
+                    { status: 400 }
+                );
+            }
+        }
+
         const existente = await prisma.usuario.findFirst({
             where: { OR: [{ dni }, { email }] },
         });
@@ -35,18 +47,10 @@ export async function POST(req: Request) {
             );
         }
 
-        // const practica = await prisma.practicaDeportiva.findUnique({
-        //     where: { id: practicaId },
-        // });
-        // if (!practica) {
-        //     return NextResponse.json({ error: "La práctica especificada no existe" }, { status: 400 });
-        // }
-
         //const hashedPassword = await bcrypt.hash(password, 10);
 
         const nuevoEntrenador = await prisma.entrenador.create({
             data: {
-                // practica: { connect: { id: practicaId } },
                 usuario: {
                     create: {
                         nombre,
@@ -58,10 +62,11 @@ export async function POST(req: Request) {
                         rol: Rol.ENTRENADOR,
                     },
                 },
+                ...(practicaId && { practica: { connect: { id: practicaId } } }),
             },
             include: {
                 usuario: true,
-                // practica: true,
+                practica: true,
             },
         });
 

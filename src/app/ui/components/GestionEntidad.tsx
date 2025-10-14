@@ -40,17 +40,6 @@ export default function GestionEntidad({ tipo }: GestionEntidadProps) {
     } else {
       setModalError(true);
     }
-    // Simulación de búsqueda por DNI
-    // if (dniInput === "12345678") {
-    //   setUsuarioEncontrado({
-    //     nombre: "Juan",
-    //     apellido: "Pérez",
-    //     email: "juan@example.com",
-    //     dni: dniInput,
-    //   });
-    // } else {
-    //   setModalError(true);
-    // }
   };
 
   const guardarCambios = () => {

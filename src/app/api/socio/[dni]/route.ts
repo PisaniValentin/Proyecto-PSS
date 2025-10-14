@@ -2,13 +2,15 @@ import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { Rol, TipoPlan, EstadoSocio } from "@prisma/client";
 
-export async function GET(
-    _req: NextRequest,
-    { params }: { params: { dni: string } }
-) {
+export async function GET(_req: NextRequest, context: { params: { dni: string } }) {
+    const { dni } = await context.params;
+
+    if (!dni) {
+        return NextResponse.json({ error: 'Falta o es inválido el dni del usuario' }, { status: 400 })
+    }
     try {
         const socio = await prisma.socio.findFirst({
-            where: { usuario: { dni: params.dni } },
+            where: { usuario: { dni } },
             include: {
                 usuario: true,
                 familia: true,
@@ -36,17 +38,19 @@ export async function GET(
     }
 }
 
-export async function PUT(
-    req: NextRequest,
-    { params }: { params: { dni: string } }
-) {
+export async function PUT(req: NextRequest, context: { params: { dni: string } }) {
+    const { dni } = await context.params;
+
+    if (!dni) {
+        return NextResponse.json({ error: 'Falta o es inválido el dni del usuario' }, { status: 400 })
+    }
     try {
         const data = await req.json();
         const { nombre, apellido, email, telefono, password, tipoPlan, estado, familiaId } =
             data;
 
         const socio = await prisma.socio.findFirst({
-            where: { usuario: { dni: params.dni } },
+            where: { usuario: { dni } },
             include: { usuario: true },
         });
 
@@ -91,7 +95,9 @@ export async function PUT(
             data: {
                 tipoPlan: tipoPlan ?? socio.tipoPlan,
                 estado: estado ?? socio.estado,
-                familiaId: familiaId ?? socio.familiaId,
+                familia: familiaId
+                    ? { connect: { id: familiaId } }
+                    : { disconnect: true },
                 usuario: {
                     update: {
                         nombre: nombre ?? socio.usuario.nombre,
@@ -119,12 +125,12 @@ export async function PUT(
     }
 }
 
-export async function DELETE(
-    _req: NextRequest,
-    context: { params: { dni: string } }
-) {
-
+export async function DELETE(_req: NextRequest, context: { params: { dni: string } }) {
     const { dni } = await context.params;
+
+    if (!dni) {
+        return NextResponse.json({ error: 'Falta o es inválido el dni del usuario' }, { status: 400 })
+    }
 
     try {
         const socio = await prisma.socio.findFirst({
@@ -137,7 +143,7 @@ export async function DELETE(
         }
 
         await prisma.socio.delete({ where: { id: socio.id } });
-        await prisma.usuario.delete({ where: { id: socio.usuarioId } });
+        await prisma.usuario.delete({ where: { dni: socio.usuarioDni } });
 
         return NextResponse.json({ message: "Socio eliminado correctamente" }, { status: 200 });
     } catch (error) {

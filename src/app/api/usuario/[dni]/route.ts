@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 
-export async function GET(_req: NextRequest, context: { params: { id: string } }) {
-    const usuarioId = Number(context.params.id);
+export async function GET(_req: NextRequest, context: { params: { dni: string } }) {
+    const { dni } = await context.params;
 
-    if (!usuarioId || isNaN(usuarioId)) {
-        return NextResponse.json({ error: 'Falta o es inválido el id del usuario' }, { status: 400 })
+    if (!dni) {
+        return NextResponse.json({ error: 'Falta o es inválido el dni del usuario' }, { status: 400 })
     }
     try {
         const usuario = await prisma.usuario.findUnique({
-            where: { id: usuarioId },
+            where: { dni },
             select: {
                 id: true,
                 nombre: true,
@@ -27,22 +27,27 @@ export async function GET(_req: NextRequest, context: { params: { id: string } }
         }
         return NextResponse.json(usuario, { status: 200 });
     } catch (error: any) {
-        return NextResponse.json({ error: "Error al obtener el usuario con el id brindado" }, { status: 500 });
+        return NextResponse.json({ error: "Error al obtener el usuario con el dni brindado" }, { status: 500 });
     }
 }
 
-export async function PUT(req: NextRequest, context: { params: { id: string } }) {
-    const usuarioId = Number(context.params.id);
+export async function PUT(req: NextRequest, context: { params: { dni: string } }) {
+    const { dni } = await context.params;
 
-    if (!usuarioId || isNaN(usuarioId)) {
-        return NextResponse.json({ error: 'Falta o es inválido el id del usuario' }, { status: 400 })
+    if (!dni) {
+        return NextResponse.json({ error: 'Falta o es inválido el dni del usuario' }, { status: 400 })
     }
 
     try {
         const data = await req.json();
 
+        const usuarioExistente = await prisma.usuario.findUnique({ where: { dni } });
+        if (!usuarioExistente) {
+            return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
+        }
+
         const usuarioActualizado = await prisma.usuario.update({
-            where: { id: usuarioId },
+            where: { dni },
             data,
             select: {
                 id: true,
@@ -56,31 +61,28 @@ export async function PUT(req: NextRequest, context: { params: { id: string } })
             },
         })
 
-        if (!usuarioActualizado) {
-            return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 })
-        }
-
         return NextResponse.json(usuarioActualizado, { status: 200 })
     } catch (error) {
+        console.error("Error al modificar usuario:", error);
+
         return NextResponse.json({ error: 'Error al modificar un usuario' }, { status: 500 })
     }
 }
 
-export async function DELETE(_req: NextRequest, context: { params: { id: string } }) {
-    const { id } = await context.params;
-    const usuarioId = Number(id);
+export async function DELETE(_req: NextRequest, context: { params: { dni: string } }) {
+    const { dni } = await context.params;
 
-    if (!usuarioId || isNaN(usuarioId)) {
-        return NextResponse.json({ error: 'Falta o es inválido el id del usuario' }, { status: 400 })
+    if (!dni) {
+        return NextResponse.json({ error: 'Falta o es inválido el dni del usuario' }, { status: 400 })
     }
     try {
-        const usuarioExistente = await prisma.usuario.findUnique({ where: { id: usuarioId } })
+        const usuarioExistente = await prisma.usuario.findUnique({ where: { dni } })
 
         if (!usuarioExistente) {
             return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 })
         }
-        await prisma.usuario.delete({ where: { id: usuarioId } })
-        return NextResponse.json(null, { status: 204 });
+        await prisma.usuario.delete({ where: { dni } })
+        return NextResponse.json({ message: 'Usuario eliminado correctamente' }, { status: 200 });
     } catch (error) {
         return NextResponse.json({ error: 'Error al eliminar un usuario' }, { status: 500 })
     }

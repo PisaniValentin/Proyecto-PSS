@@ -1,21 +1,18 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { Rol } from "@prisma/client";
 
-export async function GET(
-    req: Request,
-    context: { params: { dni: string } }
-) {
-    const dni = context.params.dni;
+export async function GET(_req: NextRequest, context: { params: { dni: string } }) {
+    const { dni } = await context.params;
+
+    if (!dni) {
+        return NextResponse.json({ error: 'Falta o es inválido el dni del usuario' }, { status: 400 })
+    }
     try {
-        // const entrenador = await prisma.entrenador.findFirst({
-        //     where: { usuario: { dni: params.dni } },
-        //     include: { usuario: true, practica: true },
-        // });
-        const entrenador = await prisma.entrenador.findUnique({
-            where: { usuarioDni: dni },
+        const entrenador = await prisma.entrenador.findFirst({
+            where: { usuario: { dni } },
             include: { usuario: true, practica: true },
-});
+        });
 
         if (!entrenador) {
             return NextResponse.json(
@@ -34,16 +31,18 @@ export async function GET(
     }
 }
 
-export async function PUT(
-    req: Request,
-    { params }: { params: { dni: string } }
-) {
+export async function PUT(req: NextRequest, context: { params: { dni: string } }) {
+    const { dni } = await context.params;
+
+    if (!dni) {
+        return NextResponse.json({ error: 'Falta o es inválido el dni del usuario' }, { status: 400 })
+    }
     try {
         const data = await req.json();
         const { nombre, apellido, email, telefono, password, practicaId } = data;
 
         const entrenador = await prisma.entrenador.findFirst({
-            where: { usuario: { dni: params.dni } },
+            where: { usuario: { dni } },
             include: { usuario: true },
         });
 
@@ -73,9 +72,6 @@ export async function PUT(
         const entrenadorActualizado = await prisma.entrenador.update({
             where: { id: entrenador.id },
             data: {
-                practica: {
-                    connect: { id: practicaId ?? entrenador.practicaId },
-                },
                 usuario: {
                     update: {
                         nombre: nombre ?? entrenador.usuario.nombre,
@@ -86,6 +82,8 @@ export async function PUT(
                         rol: Rol.ENTRENADOR,
                     },
                 },
+                ...(practicaId && { practica: { connect: { id: practicaId } } }),
+
             },
             include: { usuario: true, practica: true },
         });
@@ -100,13 +98,16 @@ export async function PUT(
     }
 }
 
-export async function DELETE(
-    req: Request,
-    { params }: { params: { dni: string } }
-) {
+
+export async function DELETE(_req: NextRequest, context: { params: { dni: string } }) {
+    const { dni } = await context.params;
+
+    if (!dni) {
+        return NextResponse.json({ error: 'Falta o es inválido el dni del usuario' }, { status: 400 })
+    }
     try {
         const entrenador = await prisma.entrenador.findFirst({
-            where: { usuario: { dni: params.dni } },
+            where: { usuario: { dni } },
             include: { usuario: true },
         });
 
@@ -118,7 +119,7 @@ export async function DELETE(
         }
 
         await prisma.entrenador.delete({ where: { id: entrenador.id } });
-        // await prisma.usuario.delete({ where: { id: entrenador.usuarioId } });
+        await prisma.usuario.delete({ where: { dni: entrenador.usuarioDni } });
 
         return NextResponse.json({ message: "Entrenador eliminado correctamente" });
     } catch (error) {

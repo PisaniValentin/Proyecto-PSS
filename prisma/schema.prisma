@@ -59,23 +59,23 @@ model Usuario {
 }
 
 model Entrenador {
-    id         Int @id @default(autoincrement())
-    usuarioDni  String @unique
+    id         Int    @id @default(autoincrement())
+    usuarioDni String @unique
     practicaId Int?
 
-    usuario     Usuario           @relation(fields: [usuarioDni], references: [dni])
+    usuario     Usuario            @relation(fields: [usuarioDni], references: [dni])
     practica    PracticaDeportiva? @relation(fields: [practicaId], references: [id])
     asistencias Asistencia[]
 }
 
 model Socio {
-    id        Int         @id @default(autoincrement())
-    usuarioId Int         @unique
-    tipoPlan  TipoPlan
-    familiaId Int?
-    estado    EstadoSocio @default(ACTIVO)
+    id         Int         @id @default(autoincrement())
+    usuarioDni String      @unique
+    tipoPlan   TipoPlan
+    familiaId  Int?
+    estado     EstadoSocio @default(ACTIVO)
 
-    usuario       Usuario                @relation(fields: [usuarioId], references: [id])
+    usuario       Usuario                @relation(fields: [usuarioDni], references: [dni])
     familia       Familia?               @relation(fields: [familiaId], references: [id])
     inscripciones InscripcionDeportiva[]
     alquileres    AlquilerCancha[]

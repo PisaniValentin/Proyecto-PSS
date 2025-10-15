@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 
-export async function GET(_req: NextRequest, context: { params: { dni: string } }) {
-    const { dni } = await context.params;
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ dni: string }> }) {
+    const { dni } = await params;
 
     if (!dni) {
         return NextResponse.json({ error: 'Falta o es inválido el dni del usuario' }, { status: 400 })
@@ -31,8 +31,8 @@ export async function GET(_req: NextRequest, context: { params: { dni: string } 
     }
 }
 
-export async function PUT(req: NextRequest, context: { params: { dni: string } }) {
-    const { dni } = await context.params;
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ dni: string }> }) {
+    const { dni } = await params;
 
     if (!dni) {
         return NextResponse.json({ error: 'Falta o es inválido el dni del usuario' }, { status: 400 })
@@ -69,8 +69,8 @@ export async function PUT(req: NextRequest, context: { params: { dni: string } }
     }
 }
 
-export async function DELETE(_req: NextRequest, context: { params: { dni: string } }) {
-    const { dni } = await context.params;
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ dni: string }> }) {
+    const { dni } = await params;
 
     if (!dni) {
         return NextResponse.json({ error: 'Falta o es inválido el dni del usuario' }, { status: 400 })

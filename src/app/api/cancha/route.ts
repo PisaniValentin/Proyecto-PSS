@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { TipoDeporte } from "@prisma/client";
 
@@ -21,7 +21,7 @@ export async function GET() {
     }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
         const data = await req.json();
         const {
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
             precioHora,
         } = data;
 
-        if (!nombre || !tipoDeporte || !interior || !capacidadMax || !precioHora) {
+        if (!nombre || !tipoDeporte || !capacidadMax || !precioHora) {
             return NextResponse.json(
                 { error: "Faltan campos obligatorios" },
                 { status: 400 }

@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { TipoDeporte } from "@prisma/client";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-    const canchaId = Number(params.id);
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    const canchaId = Number(id);
 
     if (!canchaId || isNaN(canchaId)) {
         return NextResponse.json({ error: 'Falta o es inválido el id de la cancha' }, { status: 400 })
@@ -26,8 +27,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
-    const canchaId = Number(params.id);
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    const canchaId = Number(id);
 
     if (!canchaId || isNaN(canchaId)) {
         return NextResponse.json({ error: 'Falta o es inválido el id de la cancha' }, { status: 400 })
@@ -85,8 +87,9 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     }
 }
 
-export async function DELETE({ params }: { params: { id: string } }) {
-    const canchaId = Number(params.id);
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    const canchaId = Number(id);
 
     if (!canchaId || isNaN(canchaId)) {
         return NextResponse.json({ error: 'Falta o es inválido el id de la cancha' }, { status: 400 })
@@ -98,7 +101,7 @@ export async function DELETE({ params }: { params: { id: string } }) {
             return NextResponse.json({ error: 'Cancha no encontrada' }, { status: 404 })
         }
         await prisma.cancha.delete({ where: { id: canchaId } })
-        return NextResponse.json(null, { status: 204 });
+        return NextResponse.json({ message: "Cancha eliminada correctamente" }, { status: 200 });
     } catch (error) {
         return NextResponse.json({ error: 'Error al eliminar una cancha' }, { status: 500 })
     }

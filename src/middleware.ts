@@ -54,11 +54,12 @@ export async function middleware(request: NextRequest) {
     }
     if (session.user?.rol === "ENTRENADOR") {
       return NextResponse.redirect(new URL("/entrenador", request.url));
-    }else{
+    } else {
       if (session.user?.rol === "SOCIO") {
         return NextResponse.redirect(new URL("/socio", request.url));
       }
-  }}
+    }
+  }
 
   // Bloquear /entrenador si no logueado o rol no ENTRENADOR
   if (pathname.startsWith("/entrenador")) {
@@ -67,11 +68,12 @@ export async function middleware(request: NextRequest) {
     }
     if (session.user?.rol === "ADMIN") {
       return NextResponse.redirect(new URL("/admin", request.url));
-    }else{
+    } else {
       if (session.user?.rol === "SOCIO") {
         return NextResponse.redirect(new URL("/socio", request.url));
       }
-  }}
+    }
+  }
 
   if (pathname.startsWith("/socio")) {
     if (!session) {
@@ -79,11 +81,12 @@ export async function middleware(request: NextRequest) {
     }
     if (session.user?.rol === "ADMIN") {
       return NextResponse.redirect(new URL("/admin", request.url));
-    }else{
+    } else {
       if (session.user?.rol === "ENTRENADOR") {
         return NextResponse.redirect(new URL("/entrenador", request.url));
       }
-  }}
+    }
+  }
 
   // // Bloquear /cart si no logueado o rol no CLIENTE
   // if (pathname.startsWith("/cart")) {
@@ -99,5 +102,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*","/entrenador/:path*","/socio/:path*", "/api/:path*"],
+  matcher: ["/admin/:path*", "/entrenador/:path*", "/socio/:path*", "/api/:path*"],
+  runtime: "nodejs",
 };

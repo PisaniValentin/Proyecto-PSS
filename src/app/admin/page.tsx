@@ -1,13 +1,15 @@
 "use client";
 
 import { Box, Typography, Card, CardContent, Avatar } from "@mui/material";
+import { useSession } from "next-auth/react";
 
 export default function AdminDashboard() {
-    // Datos simulados del administrador
+    const { data: session } = useSession();
+
     const admin = {
-        nombre: "Juan Pérez",
-        email: "admin@clubdeportivo.com",
-        rol: "ADMIN",
+        nombre: session?.user?.name || "Administrador",
+        email: session?.user?.email || "admin@domain.com",
+        rol: "Administrador",
         imagen: "/default-avatar.png",
     };
 
@@ -41,7 +43,7 @@ export default function AdminDashboard() {
                     >
                         <CardContent className="flex flex-col items-center">
                             <Avatar
-                                alt={admin.nombre}
+                                alt={admin?.nombre}
                                 src={admin.imagen}
                                 sx={{ width: 100, height: 100, mb: 2 }}
                             />

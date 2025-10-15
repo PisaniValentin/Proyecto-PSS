@@ -251,9 +251,9 @@ export default function AltaCanchaPage() {
                             onChange={(e) => onChange("tipoDeporte", e.target.value as TipoDeporte)}
                             className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500"
                         >
-                            <option>FÚTBOL</option>
-                            <option>BÁSQUET</option>
-                            <option>NATACIÓN</option>
+                            <option>FUTBOL</option>
+                            <option>BASQUET</option>
+                            <option>NATACION</option>
                             <option>HANDBALL</option>
                         </select>
                     </label>

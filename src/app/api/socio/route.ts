@@ -56,10 +56,15 @@ export async function POST(req: Request) {
             );
         }
 
-        if (familiaId) {
-            const familia = await prisma.familia.findUnique({
-                where: { id: familiaId },
-            });
+        if (tipoPlan === TipoPlan.FAMILIAR) {
+            if (!familiaId) {
+                return NextResponse.json(
+                    { error: "Se debe seleccionar una familia para plan grupo familiar" },
+                    { status: 400 }
+                );
+            }
+
+            const familia = await prisma.familia.findUnique({ where: { id: familiaId } });
             if (!familia) {
                 return NextResponse.json(
                     { error: "Familia no encontrada" },
@@ -84,7 +89,6 @@ export async function POST(req: Request) {
         const nuevoSocio = await prisma.socio.create({
             data: {
                 tipoPlan,
-                familiaId,
                 usuario: {
                     create: {
                         nombre,
@@ -96,6 +100,9 @@ export async function POST(req: Request) {
                         rol: Rol.SOCIO,
                     },
                 },
+                ...(tipoPlan === TipoPlan.FAMILIAR && familiaId
+                    ? { familia: { connect: { id: familiaId } } }
+                    : {}),
             },
             include: {
                 usuario: true,

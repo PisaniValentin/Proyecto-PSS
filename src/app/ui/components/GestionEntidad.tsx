@@ -11,9 +11,10 @@ import ModalError from "./modal/ModalError";
 
 interface GestionEntidadProps {
   tipo: string;
+  onSuccess?: () => void;
 }
 
-export default function GestionEntidad({ tipo }: GestionEntidadProps) {
+export default function GestionEntidad({ tipo, onSuccess }: GestionEntidadProps) {
   const [modal, setModal] = useState<"crear" | "modificar" | "eliminar" | null>(
     null
   );
@@ -45,20 +46,22 @@ export default function GestionEntidad({ tipo }: GestionEntidadProps) {
   const guardarCambios = () => {
     setModal(null);
     setModalExito("modificado");
+    if (onSuccess) onSuccess();
   };
 
   const confirmarEliminacion = () => {
     setModal(null);
     setModalExito("eliminado");
+    if (onSuccess) onSuccess();
   };
 
   return (
     <Box className="p-8">
       <Typography
         variant="h6"
-        sx={{ mb: 3, fontWeight: "bold", color: "#1F2937" }}
+        sx={{ mb: 3, textTransform: "uppercase", fontWeight: "bold", color: "#1F2937" }}
       >
-        Operaciones sobre {tipo}s
+        Operaciones sobre {tipo}
       </Typography>
 
       <Grid container spacing={2}>
@@ -100,6 +103,7 @@ export default function GestionEntidad({ tipo }: GestionEntidadProps) {
           console.log("Usuario creado:", usuario);
           setModal(null);
           setModalExito("creado");
+          if (onSuccess) onSuccess();
         }}
       />
 
@@ -153,6 +157,6 @@ export default function GestionEntidad({ tipo }: GestionEntidadProps) {
         onClose={() => setModalError(false)}
         tipo={tipo}
       />
-    </Box>
+    </Box >
   );
 }

@@ -7,7 +7,7 @@ type TipoDeporte = "FUTBOL" | "BASQUET" | "NATACION" | "HANDBALL";
 type Ubicacion = "INTERIOR" | "EXTERIOR";
 
 type CanchaListado = {
-    //id: number | string;
+    id: number | string;
     nombre: string;
     tipoDeporte: string; // FUTBOL / FÚTBOL
     interior?: boolean;
@@ -113,7 +113,7 @@ export default function AltaCanchaPage() {
     // Validaciones extra antes de enviar
     function validate(): string | null {
         const nombreTrim = form.nombre.trim();
-        if (!nombreTrim /*|| /*!NOMBRE_REGEX.test(nombreTrim)*/) {
+        if (!nombreTrim || !NOMBRE_REGEX.test(nombreTrim)) {
             return "Ingresá un nombre válido: solo letras (A–Z) y espacios, sin tildes.";
         }
         if (!form.tipoDeporte) return "Seleccioná el tipo de deporte.";
@@ -217,12 +217,12 @@ export default function AltaCanchaPage() {
                         <span className="text-sm font-medium text-gray-700">Id</span>
                         <input
                             readOnly
-                            value={ generatedId}
-                    placeholder="<ID de la cancha>"
-                        className="border rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-700 italic"
+                            value={generatedId}
+                            placeholder="<ID de la cancha>"
+                            className="border rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-700 italic"
                         />
-                    </label>
-                            */}
+                    </label>*/}
+
                     {/* Nombre */}
                     <label className="flex flex-col gap-1">
                         <span className="text-sm font-medium text-gray-700">
@@ -251,9 +251,9 @@ export default function AltaCanchaPage() {
                             onChange={(e) => onChange("tipoDeporte", e.target.value as TipoDeporte)}
                             className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500"
                         >
-                            <option>FUTBOL</option>
-                            <option>BASQUET</option>
-                            <option>NATACION</option>
+                            <option>FÚTBOL</option>
+                            <option>BÁSQUET</option>
+                            <option>NATACIÓN</option>
                             <option>HANDBALL</option>
                         </select>
                     </label>
@@ -391,11 +391,11 @@ export default function AltaCanchaPage() {
                     <div className="space-y-3">
                         {canchas.map((c) => (
                             <div
-                                /*key={String(c.id)}*/
+                                key={String(c.id)}
                                 className="border rounded-lg px-3 py-2 flex items-center justify-between gap-2 hover:bg-gray-50 transition-colors"
                             >
                                 <div className="text-sm text-gray-800">
-                                    {/*<span className="font-semibold text-gray-900">ID: {String(c.id)}</span>{" "}*/}
+                                    <span className="font-semibold text-gray-900">ID: {String(c.id)}</span>{" "}
                                     — <span className="font-semibold">{c.nombre}</span>{" "}
                                     —{" "}
                                     <span className="inline-block rounded-full px-2 py-0.5 text-xs bg-blue-50 text-blue-700 border border-blue-100">

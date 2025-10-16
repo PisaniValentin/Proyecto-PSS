@@ -390,15 +390,15 @@ export default function EditarCanchaPage() {
                     <div className="space-y-3">
                         {canchas.map((c) => (
                             <div
-                                //key={c.id}
+                                key={c.id}
                                 role="button"
                                 onClick={() => setSelectedId(c.id)}
                                 className={`border rounded-lg px-3 py-2 flex items-center justify-between gap-2 hover:bg-gray-50 transition-colors cursor-pointer ${selectedId === c.id ? "border-blue-300 bg-blue-50" : "border-gray-200"
                                     }`}
                             >
                                 <div className="text-sm text-gray-800">
-                                    {/*<span className="font-semibold text-gray-900">ID: {c.id}</span>{" "}
-                                    — */}<span className="font-semibold">{c.nombre}</span>{" "}
+                                    <span className="font-semibold text-gray-900">ID: {c.id}</span>{" "}
+                                    — <span className="font-semibold">{c.nombre}</span>{" "}
                                     —{" "}
                                     <span className="inline-block rounded-full px-2 py-0.5 text-xs bg-blue-50 text-blue-700 border border-blue-100">
                                         {deporteApiToUi[c.tipoDeporte] ?? c.tipoDeporte}

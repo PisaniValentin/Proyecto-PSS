@@ -5,6 +5,7 @@ export interface UsuarioBase {
     dni: string;
     email: string;
     telefono?: string;
+    password: string;
     rol: "ADMIN" | "ENTRENADOR" | "SOCIO";
     fechaAlta: Date;
 }
@@ -15,8 +16,8 @@ export interface Administrativo extends UsuarioBase {
 
 export interface Entrenador extends UsuarioBase {
     rol: "ENTRENADOR";
-    practicaId: number;
-    practica?: PracticaDeportiva;
+    actividadDeportiva: "FUTBOL" | "BASQUET" | "NATACION" | "HANDBALL";
+    practica?: PracticaDeportiva[];
     asistencias?: Asistencia[];
 }
 
@@ -161,3 +162,4 @@ export interface CuotaSocio {
     socio?: Socio;
     pago?: Pago;
 }
+

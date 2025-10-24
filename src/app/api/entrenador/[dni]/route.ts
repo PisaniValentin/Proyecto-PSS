@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/app/lib/prisma";
-import { Rol } from "@prisma/client";
+import { Rol, TipoDeporte } from "@prisma/client";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ dni: string }> }) {
     const { dni } = await params;
@@ -11,7 +11,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ dni
     try {
         const entrenador = await prisma.entrenador.findFirst({
             where: { usuario: { dni } },
-            include: { usuario: true, practica: true },
+            include: { usuario: true, practicas: true },
         });
 
         if (!entrenador) {
@@ -39,7 +39,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ dni:
     }
     try {
         const data = await req.json();
-        const { nombre, apellido, email, telefono, password, practicaId } = data;
+        const { nombre, apellido, email, telefono, password, actividad } = data;
 
         const entrenador = await prisma.entrenador.findFirst({
             where: { usuario: { dni } },
@@ -52,17 +52,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ dni:
                 { status: 404 }
             );
         }
-
-        if (practicaId) {
-            const practica = await prisma.practicaDeportiva.findUnique({
-                where: { id: practicaId },
-            });
-            if (!practica) {
-                return NextResponse.json(
-                    { error: "La práctica especificada no existe" },
-                    { status: 400 }
-                );
-            }
+        if (!Object.values(TipoDeporte).includes(actividad)) {
+            return NextResponse.json(
+                { error: "Tipo de deporte inválido" },
+                { status: 400 }
+            );
         }
 
         {/*const hashedPassword = password
@@ -82,10 +76,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ dni:
                         rol: Rol.ENTRENADOR,
                     },
                 },
-                ...(practicaId && { practica: { connect: { id: practicaId } } }),
-
+                actividadDeportiva: actividad as TipoDeporte,
             },
-            include: { usuario: true, practica: true },
+            include: { usuario: true, practicas: true },
         });
 
         return NextResponse.json(entrenadorActualizado);
@@ -97,7 +90,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ dni:
         );
     }
 }
-
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ dni: string }> }) {
     const { dni } = await params;
@@ -118,8 +110,23 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
             );
         }
 
-        await prisma.entrenador.delete({ where: { id: entrenador.id } });
-        await prisma.usuario.delete({ where: { dni: entrenador.usuarioDni } });
+        await prisma.$transaction(async (tx) => {
+            //await tx.asistencia.deleteMany({ where: { entrenadorId: entrenador.id } });
+            const practicas = await tx.practicaDeportiva.findMany({
+                where: { entrenadores: { some: { id: entrenador.id } } },
+                select: { id: true }
+            });
+            for (const practica of practicas) {
+                await tx.practicaDeportiva.update({
+                    where: { id: practica.id },
+                    data: { entrenadores: { disconnect: { id: entrenador.id } } }
+                });
+            }
+
+            await tx.entrenador.delete({ where: { id: entrenador.id } });
+            await tx.usuario.delete({ where: { dni: entrenador.usuarioDni } });
+        });
+
 
         return NextResponse.json({ message: "Entrenador eliminado correctamente" });
     } catch (error) {

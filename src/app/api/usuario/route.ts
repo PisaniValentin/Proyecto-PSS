@@ -3,47 +3,46 @@ import prisma from "@/app/lib/prisma";
 import { Rol } from "@prisma/client";
 //import bcrypt from "bcryptjs";
 
-
 export async function GET(req: NextRequest) {
     try {
         const { searchParams } = new URL(req.url);
         const rolParam = searchParams.get("rol");
+        const dniParam = searchParams.get("dni");
 
-        let usuarios;
+        const whereClause: any = {};
 
         if (rolParam) {
-
             if (!Object.values(Rol).includes(rolParam as Rol)) {
                 return NextResponse.json(
                     { error: "Rol inválido" },
                     { status: 400 }
                 );
             }
-            usuarios = await prisma.usuario.findMany({
-                where: { rol: rolParam as Rol },
-                select: {
-                    id: true,
-                    nombre: true,
-                    apellido: true,
-                    dni: true,
-                    email: true,
-                    telefono: true,
-                    rol: true,
-                },
-            });
-        } else {
-            usuarios = await prisma.usuario.findMany({
-                select: {
-                    id: true,
-                    nombre: true,
-                    apellido: true,
-                    dni: true,
-                    email: true,
-                    telefono: true,
-                    rol: true,
-                    fechaAlta: true,
-                },
-            });
+            whereClause.rol = rolParam as Rol;
+        }
+
+        if (dniParam) {
+            whereClause.dni = dniParam;
+        }
+        const usuarios = await prisma.usuario.findMany({
+            where: whereClause,
+            select: {
+                id: true,
+                nombre: true,
+                apellido: true,
+                dni: true,
+                email: true,
+                telefono: true,
+                rol: true,
+                fechaAlta: true,
+            },
+        });
+
+        if (!usuarios || usuarios.length === 0) {
+            return NextResponse.json(
+                { error: "Usuario no encontrado" },
+                { status: 404 }
+            );
         }
 
         return NextResponse.json(usuarios, { status: 200 });

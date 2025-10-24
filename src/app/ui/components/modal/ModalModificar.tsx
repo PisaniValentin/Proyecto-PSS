@@ -32,24 +32,56 @@ export default function ModalModificar({
 }: ModalModificarProps) {
 
     const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
+
+    const validarCampo = (campo: string, valor: string) => {
+        let mensaje = "";
+
+        switch (campo) {
+            case "nombre":
+            case "apellido":
+                if (!valor.trim()) mensaje = `${campo} obligatorio`;
+                else if (valor.trim().length < 3) mensaje = `${campo} debe tener al menos 3 letras`;
+                else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(valor))
+                    mensaje = `${campo} solo debe contener letras`;
+                break;
+
+            case "email":
+                if (!valor.trim()) mensaje = "Email obligatorio";
+                else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor))
+                    mensaje = "Formato de email inválido";
+                break;
+
+        }
+
+        setErrors(prev => ({ ...prev, [campo]: mensaje }));
+        return mensaje === "";
+    };
+
+    const validarTodo = () => {
+        const campos = ["nombre", "apellido", "email", "telefono"];
+        let esValido = true;
+
+        campos.forEach(c => {
+            const valor = usuario[c] || "";
+            const valido = validarCampo(c, valor);
+            if (!valido) esValido = false;
+        });
+
+        return esValido;
+    };
 
     const Guardar = async () => {
-        setLoading(true);
+        if (!validarTodo()) return;
 
+        setLoading(true);
         try {
             let endpoint = "";
             const dni = usuario.dni;
-            if (tipo === "Administrativo") {
-                endpoint = `/api/usuario/${dni}`;
-            } else if (tipo === "Entrenador") {
-                endpoint = `/api/entrenador/${dni}`;
-            } else if (tipo === "Socio") {
-                endpoint = `/api/socio/${dni}`;
-            } else {
-                console.error("Tipo de usuario no soportado");
-                setLoading(false);
-                return;
-            }
+            if (tipo === "Administrativo") endpoint = `/api/usuario/${dni}`;
+            else if (tipo === "Entrenador") endpoint = `/api/entrenador/${dni}`;
+            else if (tipo === "Socio") endpoint = `/api/socio/${dni}`;
+            else return console.error("Tipo de usuario no soportado");
 
             const body: any = {
                 nombre: usuario.nombre,
@@ -58,7 +90,6 @@ export default function ModalModificar({
                 telefono: usuario.telefono,
             };
 
-            // Campos específicos por tipo
             if (tipo === "Entrenador") {
                 body.practicaId = usuario.practicaId || null;
             } else if (tipo === "Socio") {
@@ -74,63 +105,64 @@ export default function ModalModificar({
 
             const data = await res.json();
 
-            if (!res.ok) {
-                console.error(data.error || "Error al actualizar usuario");
-                setLoading(false);
-                return;
-            }
-
-            onGuardar()
+            if (!res.ok) throw new Error(data.error || "Error al actualizar usuario");
+            onGuardar();
         } catch (error) {
             console.error("Error al guardar cambios:", error);
         } finally {
             setLoading(false);
         }
     };
+
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle>Modificar {tipo}</DialogTitle>
             <DialogContent dividers>
                 <Grid container direction="column" spacing={2}>
-                    {/* Campos comunes */}
                     <Grid>
                         <TextField
                             fullWidth
                             label="Nombre"
-                            variant="outlined"
                             value={usuario?.nombre || ""}
                             onChange={(e) => setUsuario({ ...usuario, nombre: e.target.value })}
+                            onBlur={(e) => validarCampo("nombre", e.target.value)}
+                            error={!!errors.nombre}
+                            helperText={errors.nombre}
                         />
                     </Grid>
                     <Grid>
                         <TextField
                             fullWidth
                             label="Apellido"
-                            variant="outlined"
                             value={usuario?.apellido || ""}
                             onChange={(e) => setUsuario({ ...usuario, apellido: e.target.value })}
+                            onBlur={(e) => validarCampo("apellido", e.target.value)}
+                            error={!!errors.apellido}
+                            helperText={errors.apellido}
                         />
                     </Grid>
                     <Grid>
                         <TextField
                             fullWidth
                             label="Email"
-                            variant="outlined"
                             value={usuario?.email || ""}
                             onChange={(e) => setUsuario({ ...usuario, email: e.target.value })}
+                            onBlur={(e) => validarCampo("email", e.target.value)}
+                            error={!!errors.email}
+                            helperText={errors.email}
                         />
                     </Grid>
                     <Grid>
                         <TextField
                             fullWidth
                             label="Teléfono"
-                            variant="outlined"
                             value={usuario?.telefono || ""}
                             onChange={(e) => setUsuario({ ...usuario, telefono: e.target.value })}
+                            error={!!errors.telefono}
+                            helperText={errors.telefono}
                         />
                     </Grid>
 
-                    {/* Campos para Socio */}
                     {tipo === "Socio" && (
                         <>
                             <Grid>
@@ -145,23 +177,8 @@ export default function ModalModificar({
                                     <MenuItem value="FAMILIAR">Familiar</MenuItem>
                                 </TextField>
                             </Grid>
-                            <Grid>
-                                <TextField
-                                    select
-                                    fullWidth
-                                    label="Estado"
-                                    value={usuario?.estado || "ACTIVO"}
-                                    onChange={(e) => setUsuario({ ...usuario, estado: e.target.value })}
-                                >
-                                    <MenuItem value="ACTIVO">Activo</MenuItem>
-                                    <MenuItem value="INACTIVO">Inactivo</MenuItem>
-                                    <MenuItem value="BLOQUEADO">Bloqueado</MenuItem>
-                                </TextField>
-                            </Grid>
                         </>
                     )}
-
-                    {/* Campos para Entrenador */}
                     {tipo === "Entrenador" && (
                         <Grid>
                             <TextField

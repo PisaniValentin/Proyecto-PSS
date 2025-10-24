@@ -7,9 +7,11 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import PaymentIcon from '@mui/icons-material/Payment';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import HomeIcon from '@mui/icons-material/Home';
 import Link from "next/link";
 
 const secciones = [
+  { nombre: "Home", path: "", icon: <HomeIcon /> },
   { nombre: "Prácticas Deportivas", path: "practicas", icon: <SportsSoccerIcon /> },
   { nombre: "Alquileres", path: "alquileres", icon: <SportsBasketballIcon /> },
   { nombre: "Gestión de Cuentas", path: "cuentas", icon: <AccountCircleIcon /> },
@@ -30,7 +32,7 @@ export default function Sidebar() {
       }}
     >
       <Typography variant="h6" sx={{ mb: 4, textAlign: 'center', fontWeight: 'bold' }}>
-        Admin Panel
+        Panel
       </Typography>
       <List>
         {secciones.map((sec) => (

@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/app/lib/prisma";
-import { Rol } from "@prisma/client";
+import { Rol, TipoDeporte } from "@prisma/client";
 
 export async function GET() {
     try {
         const entrenadores = await prisma.entrenador.findMany({
             include: {
                 usuario: true,
-                practica: true,
+                practicas: true,
             },
         });
         return NextResponse.json(entrenadores);
@@ -16,30 +16,24 @@ export async function GET() {
     }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
         const data = await req.json();
-        const { nombre, apellido, dni, email, telefono, password, practicaId } = data;
+        const { nombre, apellido, dni, email, telefono, password, actividad } = data;
 
-        if (!nombre || !apellido || !dni || !email || !password) {
+        if (!nombre || !apellido || !dni || !email || !password || !actividad) {
             return NextResponse.json({ error: "Faltan datos obligatorios" }, { status: 400 });
         }
-
-        if (practicaId) {
-            const practica = await prisma.practicaDeportiva.findUnique({
-                where: { id: practicaId },
-            });
-            if (!practica) {
-                return NextResponse.json(
-                    { error: "Practica Deportiva no encontrada" },
-                    { status: 400 }
-                );
-            }
+        if (!Object.values(TipoDeporte).includes(actividad)) {
+            return NextResponse.json(
+                { error: "Tipo de deporte inválido" },
+                { status: 400 }
+            );
         }
-
         const existente = await prisma.usuario.findFirst({
             where: { OR: [{ dni }, { email }] },
         });
+
         if (existente) {
             return NextResponse.json(
                 { error: "El DNI o el email ya están registrados" },
@@ -58,15 +52,15 @@ export async function POST(req: Request) {
                         dni,
                         email,
                         telefono,
-                        password,//hasedPassword,
+                        password,
                         rol: Rol.ENTRENADOR,
                     },
                 },
-                ...(practicaId && { practica: { connect: { id: practicaId } } }),
+                actividadDeportiva: actividad as TipoDeporte,
             },
             include: {
                 usuario: true,
-                practica: true,
+                practicas: true,
             },
         });
 

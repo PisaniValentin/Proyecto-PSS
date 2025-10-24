@@ -33,11 +33,20 @@ export default function GestionEntidad({ tipo, onSuccess }: GestionEntidadProps)
   const handleClose = () => setModal(null);
 
   const buscarUsuario = async () => {
-    const res = await fetch(`/api/usuario/${dniInput}`);
+    const rol = tipo === "Administrativo" ? "ADMIN" :
+      tipo === "Socio" ? "SOCIO" :
+        "ENTRENADOR"
+
+    const res = await fetch(`/api/usuario?rol=${rol}&dni=${dniInput}`);
     const data = await res.json();
 
     if (res.ok) {
-      setUsuarioEncontrado(data);
+      const usuario = Array.isArray(data) ? data[0] : data;
+      if (usuario) {
+        setUsuarioEncontrado(usuario);
+      } else {
+        setModalError(true);
+      }
     } else {
       setModalError(true);
     }

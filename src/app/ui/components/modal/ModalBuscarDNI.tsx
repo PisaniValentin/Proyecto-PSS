@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import {
     Dialog,
     DialogTitle,
@@ -29,6 +29,41 @@ export default function ModalBuscarDNI({
     onBuscar,
     eliminar,
 }: ModalBuscarDNIProps) {
+
+    const [error, setError] = useState<string>("");
+
+    const validarDNI = (): boolean => {
+        if (!dniInput.trim()) {
+            setError("El DNI es obligatorio");
+            return false;
+        }
+
+        if (!/^\d+$/.test(dniInput)) {
+            setError("El DNI solo debe contener números");
+            return false;
+        }
+
+        if (dniInput.length < 7 || dniInput.length > 8) {
+            setError("El DNI debe tener entre 7 y 8 dígitos");
+            return false;
+        }
+
+        setError("");
+        return true;
+    };
+
+    const handleBuscar = () => {
+        if (validarDNI()) {
+            onBuscar();
+        }
+    };
+
+    const limpiarCampos = () => {
+        setDniInput("");
+        setError("");
+        onClose()
+    };
+
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle>{eliminar ? `Eliminar ${tipo}` : `Modificar ${tipo}`}</DialogTitle>
@@ -42,15 +77,20 @@ export default function ModalBuscarDNI({
                     label="DNI"
                     variant="outlined"
                     value={dniInput}
-                    onChange={(e) => setDniInput(e.target.value)}
+                    onChange={(e) => {
+                        setDniInput(e.target.value);
+                        if (error) setError("");
+                    }}
+                    error={!!error}
+                    helperText={error}
                 />
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Cancelar</Button>
+                <Button onClick={limpiarCampos}>Cancelar</Button>
                 <Button
                     variant="contained"
                     color={eliminar ? "error" : "secondary"}
-                    onClick={onBuscar}
+                    onClick={handleBuscar}
                 >
                     Buscar
                 </Button>

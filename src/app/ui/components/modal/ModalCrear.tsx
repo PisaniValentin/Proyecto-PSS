@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Grid, TextField, Button, MenuItem } from "@mui/material";
-import { UsuarioBase, Administrativo, Entrenador, Socio } from "@/app/lib/types";
+import { UsuarioBase, Entrenador, Socio } from "@/app/lib/types";
 
 interface ModalCrearProps<T extends UsuarioBase> {
     open: boolean;
@@ -13,15 +13,70 @@ interface ModalCrearProps<T extends UsuarioBase> {
 export default function ModalCrear<T extends UsuarioBase>({ open, onClose, tipo, onCrear }: ModalCrearProps<T>) {
     const [form, setForm] = useState<Partial<T>>({} as Partial<T>);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     const handleChange = (key: keyof T, value: any) => {
         setForm(prev => ({ ...prev, [key]: value }));
+        setErrors(prev => ({ ...prev, [key]: "" }));
+    };
+
+    const handleClose = () => {
+        setForm({} as Partial<T>);
+        setErrors({});
+        onClose();
+    };
+
+    const validar = (campo?: keyof T): boolean => {
+        const newErrors: Record<string, string> = {};
+        const campos = campo ? [campo] : ["nombre", "apellido", "dni", "email", "password", "tipoPlan", "actividad"] as (keyof T)[];
+
+        campos.forEach(key => {
+            const value = (form as any)[key];
+
+            if (key === "nombre") {
+                if (!value?.trim()) newErrors.nombre = "Nombre obligatorio";
+                else if ((value?.trim().length ?? 0) < 3) newErrors.nombre = "El nombre debe contener al menos 3 letras";
+                else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(value)) newErrors.nombre = "Nombre solo debe contener caracteres alfabéticos";
+            }
+
+            if (key === "apellido") {
+                if (!value?.trim()) newErrors.apellido = "Apellido obligatorio";
+                else if ((value?.trim().length ?? 0) < 3) newErrors.apellido = "El apellido debe contener al menos 3 letras";
+                else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(value)) newErrors.apellido = "Apellido solo debe contener caracteres alfabéticos";
+            }
+
+            if (key === "dni") {
+                if (!value?.trim()) newErrors.dni = "DNI obligatorio";
+                else if (!/^\d+$/.test(value)) newErrors.dni = "DNI solo debe contener números";
+                else if (value.length < 7 || value.length > 8) newErrors.dni = "DNI debe tener 7 u 8 dígitos";
+            }
+
+            if (key === "email") {
+                if (!value?.trim()) newErrors.email = "Email obligatorio";
+                else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) newErrors.email = "Email inválido";
+            }
+
+            if (key === "password") {
+                if (!value) newErrors.password = "Contraseña obligatoria";
+            }
+
+            if (tipo === "Socio" && key === "tipoPlan" && !(form as Partial<Socio>).tipoPlan) {
+                newErrors.tipoPlan = "Seleccione un tipo de plan";
+            }
+
+            if (tipo === "Entrenador" && key === "actividad" && !(form as Partial<Entrenador>).actividadDeportiva) {
+                newErrors.actividad = "Seleccione una actividad";
+            }
+        });
+
+        setErrors(prev => ({ ...prev, ...newErrors }));
+        return Object.keys(newErrors).length === 0;
     };
 
     const crearUsuario = async () => {
+        if (!validar()) return;
+
         setLoading(true);
-        setError(null);
         try {
             let url = "";
             let body: any = { ...form };
@@ -31,10 +86,12 @@ export default function ModalCrear<T extends UsuarioBase>({ open, onClose, tipo,
                 body.rol = "ADMIN";
             } else if (tipo === "Socio") {
                 url = "/api/socio";
-                body.tipoPlan = (form as Partial<Socio>).tipoPlan;
             } else if (tipo === "Entrenador") {
                 url = "/api/entrenador";
-                body.practicaId = Number((form as Partial<Entrenador>).practicaId);
+                body = {
+                    ...form,
+                    actividad: (form as Partial<Entrenador>).actividadDeportiva
+                };
             } else {
                 throw new Error("Tipo de usuario no válido");
             }
@@ -51,9 +108,10 @@ export default function ModalCrear<T extends UsuarioBase>({ open, onClose, tipo,
 
             onCrear(data);
             setForm({} as Partial<T>);
+            setErrors({});
             onClose();
         } catch (err: any) {
-            setError(err.message);
+            setErrors({ general: err.message });
         } finally {
             setLoading(false);
         }
@@ -64,60 +122,111 @@ export default function ModalCrear<T extends UsuarioBase>({ open, onClose, tipo,
             <DialogTitle>Crear {tipo}</DialogTitle>
             <DialogContent dividers>
                 <Grid container direction="column" spacing={2}>
-                    <Grid><TextField fullWidth label="Nombre" value={form.nombre || ""} onChange={e => handleChange("nombre", e.target.value)} /></Grid>
-                    <Grid><TextField fullWidth label="Apellido" value={form.apellido || ""} onChange={e => handleChange("apellido", e.target.value)} /></Grid>
-                    <Grid><TextField fullWidth label="DNI" value={form.dni || ""} onChange={e => handleChange("dni", e.target.value)} /></Grid>
-                    <Grid><TextField fullWidth label="Email" value={form.email || ""} onChange={e => handleChange("email", e.target.value)} /></Grid>
-                    <Grid><TextField fullWidth label="Teléfono" value={form.telefono || ""} onChange={e => handleChange("telefono", e.target.value)} /></Grid>
-                    <Grid><TextField fullWidth label="Contraseña" type="password" onChange={e => handleChange("password" as any, e.target.value)} /></Grid>
+                    <Grid>
+                        <TextField
+                            fullWidth
+                            label="Nombre"
+                            value={form.nombre || ""}
+                            onChange={e => handleChange("nombre", e.target.value)}
+                            onBlur={() => validar("nombre")}
+                            error={!!errors.nombre}
+                            helperText={errors.nombre}
+                        />
+                    </Grid>
+                    <Grid>
+                        <TextField
+                            fullWidth
+                            label="Apellido"
+                            value={form.apellido || ""}
+                            onChange={e => handleChange("apellido", e.target.value)}
+                            onBlur={() => validar("apellido")}
+                            error={!!errors.apellido}
+                            helperText={errors.apellido}
+                        />
+                    </Grid>
+                    <Grid>
+                        <TextField
+                            fullWidth
+                            label="DNI"
+                            value={form.dni || ""}
+                            onChange={e => handleChange("dni", e.target.value)}
+                            onBlur={() => validar("dni")}
+                            error={!!errors.dni}
+                            helperText={errors.dni}
+                        />
+                    </Grid>
+                    <Grid>
+                        <TextField
+                            fullWidth
+                            label="Email"
+                            value={form.email || ""}
+                            onChange={e => handleChange("email", e.target.value)}
+                            onBlur={() => validar("email")}
+                            error={!!errors.email}
+                            helperText={errors.email}
+                        />
+                    </Grid>
+                    <Grid>
+                        <TextField
+                            fullWidth
+                            label="Teléfono"
+                            value={form.telefono || ""}
+                            onChange={e => handleChange("telefono", e.target.value)}
+                        />
+                    </Grid>
+                    <Grid>
+                        <TextField
+                            fullWidth
+                            label="Contraseña"
+                            type="password"
+                            onChange={e => handleChange("password" as any, e.target.value)}
+                            onBlur={() => validar("password")}
+                            error={!!errors.password}
+                            helperText={errors.password}
+                        />
+                    </Grid>
 
                     {tipo === "Socio" && (
-                        <>
-                            <Grid>
-                                <TextField
-                                    select
-                                    fullWidth
-                                    label="Tipo de Plan"
-                                    value={(form as Partial<Socio>).tipoPlan || ""}
-                                    onChange={e => handleChange("tipoPlan" as any, e.target.value)}
-                                >
-                                    <MenuItem value="INDIVIDUAL">INDIVIDUAL</MenuItem>
-                                    <MenuItem value="FAMILIAR">FAMILIAR</MenuItem>
-                                </TextField>
-                            </Grid>
-                            <Grid>
-                                <TextField
-                                    select
-                                    fullWidth
-                                    label="Estado"
-                                    value={(form as Partial<Socio>).estado || ""}
-                                    onChange={e => handleChange("estado" as any, e.target.value)}
-                                >
-                                    <MenuItem value="ACTIVO">ACTIVO</MenuItem>
-                                    <MenuItem value="INACTIVO">INACTIVO</MenuItem>
-                                    <MenuItem value="BLOQUEADO">BLOQUEADO</MenuItem>
-                                </TextField>
-                            </Grid>
-                        </>
+                        <Grid>
+                            <TextField
+                                select
+                                fullWidth
+                                label="Tipo de Plan"
+                                value={(form as Partial<Socio>).tipoPlan || ""}
+                                onChange={e => handleChange("tipoPlan" as any, e.target.value)}
+                                error={!!errors.tipoPlan}
+                                helperText={errors.tipoPlan}
+                            >
+                                <MenuItem value="INDIVIDUAL">INDIVIDUAL</MenuItem>
+                                <MenuItem value="FAMILIAR">FAMILIAR</MenuItem>
+                            </TextField>
+                        </Grid>
                     )}
 
                     {tipo === "Entrenador" && (
                         <Grid>
                             <TextField
+                                select
                                 fullWidth
-                                label="ID Práctica Deportiva"
-                                type="number"
-                                value={(form as Partial<Entrenador>).practicaId || ""}
-                                onChange={e => handleChange("practicaId" as any, Number(e.target.value))}
-                            />
+                                label="Actividad Deportiva"
+                                value={(form as Partial<Entrenador>).actividadDeportiva || ""}
+                                onChange={e => handleChange("actividadDeportiva" as keyof T, e.target.value)}
+                                error={!!errors.actividad}
+                                helperText={errors.actividad}
+                            >
+                                <MenuItem value="FUTBOL">FÚTBOL</MenuItem>
+                                <MenuItem value="BASQUET">BÁSQUET</MenuItem>
+                                <MenuItem value="NATACION">NATACIÓN</MenuItem>
+                                <MenuItem value="HANDBALL">HANDBALL</MenuItem>
+                            </TextField>
                         </Grid>
                     )}
 
-                    {error && <Grid><p style={{ color: "red" }}>{error}</p></Grid>}
+                    {errors.general && <Grid><p style={{ color: "red" }}>{errors.general}</p></Grid>}
                 </Grid>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Cancelar</Button>
+                <Button onClick={handleClose}>Cancelar</Button>
                 <Button variant="contained" color="primary" onClick={crearUsuario} disabled={loading}>
                     {loading ? "Creando..." : "Crear"}
                 </Button>

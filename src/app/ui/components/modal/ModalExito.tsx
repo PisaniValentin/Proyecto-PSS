@@ -8,6 +8,7 @@ import {
   Typography,
   Button,
 } from "@mui/material";
+import Check from '@mui/icons-material/CheckCircleOutline';
 
 interface ModalExitoProps {
   open: boolean;
@@ -30,14 +31,14 @@ export default function ModalExito({
         transition: { timeout: 0 },
       }}
     >
-      <DialogTitle>Éxito</DialogTitle>
+      <DialogTitle><Check sx={{ color: 'green', fontWeight: 'bold' }} /> Éxito</DialogTitle>
       <DialogContent dividers>
         <Typography>
           {exito !== null && exito === "modificado"
             ? `${tipo} modificado con éxito`
             : exito === "creado"
-            ? `${tipo} creado con éxito`
-            : `${tipo} eliminado con éxito`}
+              ? `${tipo} creado con éxito`
+              : `${tipo} eliminado con éxito`}
         </Typography>
       </DialogContent>
       <DialogActions>

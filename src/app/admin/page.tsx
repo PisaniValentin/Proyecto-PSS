@@ -10,7 +10,7 @@ export default function AdminDashboard() {
         nombre: session?.user?.name || "Administrador",
         email: session?.user?.email || "admin@domain.com",
         rol: "Administrador",
-        imagen: "/default-avatar.png",
+        imagen: "/default-avatar.webp",
     };
 
     return (
@@ -36,7 +36,7 @@ export default function AdminDashboard() {
                     <Card
                         sx={{
                             maxWidth: 400,
-                            backgroundColor: "#ffffff",
+                            backgroundColor: "#E7E7E7",
                             boxShadow: 3,
                             borderRadius: 3,
                         }}

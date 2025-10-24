@@ -37,7 +37,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     try {
         const body = await req.json();
-        const { nombre, tipoDeporte, interior, capacidadMax, precioHora, activa } =
+        const { nombre, tipoDeporte, interior, capacidadMax, precioHora } =
             body;
 
         const canchaExistente = await prisma.cancha.findUnique({
@@ -73,7 +73,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
                     precioHora !== undefined
                         ? Number(precioHora)
                         : canchaExistente.precioHora,
-                activa: activa ?? canchaExistente.activa,
             },
             include: {
                 horarios: true,

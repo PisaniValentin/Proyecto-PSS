@@ -13,7 +13,7 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import { TipoDeporte, Usuario, Entrenador, Cancha } from "@prisma/client";
+import { Entrenador, Cancha } from "@prisma/client";
 
 type EntrenadorConUsuario = Entrenador & {
     usuario: {
@@ -24,7 +24,7 @@ type EntrenadorConUsuario = Entrenador & {
     };
 };
 
-const days = ["LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"];
+const days = ["LUNES", "MARTES", "MÍERCOLES", "JUEVES", "VIERNES", "SÁBADO"];
 const hours = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00"]
 
 export default function AltaPracticaDeportiva() {
@@ -74,8 +74,8 @@ export default function AltaPracticaDeportiva() {
                 fechaFin,
                 precio: Number(precio),
                 entrenadorIds: entrenadorId ? [Number(entrenadorId)] : [],
-                horarios: diasSeleccionados.map((dia) => ({
-                    dia,
+                horarios: diasSeleccionados.map((d) => ({
+                    dia: quitarAcento(d),
                     horaInicio: inicio,
                     horaFin: fin,
                 })),
@@ -128,12 +128,21 @@ export default function AltaPracticaDeportiva() {
         ? hours.slice(hours.indexOf(inicio) + 1)
         : hours.slice(1);
 
+    function quitarAcento(texto: string): string {
+        return texto
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+    }
+
     return (
         <Box
             sx={{
                 padding: 2,
-                maxWidth: 600,
+                maxWidth: 700,
                 margin: "auto",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center"
             }}
         >
             <Typography variant="h6" gutterBottom>
@@ -273,9 +282,18 @@ export default function AltaPracticaDeportiva() {
 
             <Button
                 variant="contained"
-                color="primary"
-                fullWidth
                 onClick={handleGuardar}
+                sx={{
+                    backgroundColor: "#222222",
+                    "&:hover": {
+                        backgroundColor: "#333333"
+                    },
+                    width: "50%",
+                    display: "block",
+                    margin: "0 auto",
+                    padding: "0.75rem",
+                    my: 2
+                }}
             >
                 Guardar
             </Button>

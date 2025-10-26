@@ -17,6 +17,7 @@ interface ModalEliminarPracticaProps {
     open: boolean;
     onClose: () => void;
     onDelete: () => void;
+    selectedId: string;
     deporte?: string;
     fechaInicio?: string;
     fechaFin?: string;
@@ -29,6 +30,7 @@ export default function ModalEliminarPractica({
     open,
     onClose,
     onDelete,
+    selectedId,
     deporte,
     fechaInicio,
     fechaFin,
@@ -39,10 +41,24 @@ export default function ModalEliminarPractica({
 
     const [openModal, setOpenModal] = useState(false)
 
-    const handleEliminar = () => {
-        setOpenModal(true)
-        onDelete()
-    }
+    const handleEliminar = async () => {
+        if (!deporte || !fechaInicio || !fechaFin) return;
+        try {
+            const res = await fetch(`/api/practicaDeportiva/${selectedId}`, {
+                method: "DELETE",
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || "Error al eliminar la práctica");
+            }
+            setOpenModal(true);
+            onDelete();
+        } catch (error: any) {
+            console.error(error);
+            alert(error.message || "No se pudo eliminar la práctica");
+        }
+    };
 
     return (
         <>

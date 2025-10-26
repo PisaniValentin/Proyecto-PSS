@@ -5,9 +5,9 @@ import { Box, Button, Card, CardContent, Typography } from "@mui/material";
 interface ListCardProps {
     tipoPractica: string;
     canchaAsignada: string;
-    diasAsignados: string;
-    horarioInicio: string;
+    horarioAsignado: string;
     profesorAsignado: string;
+    precioAsignado: number;
     onDelete: () => void;
     onModify: () => void;
 }
@@ -15,9 +15,9 @@ interface ListCardProps {
 export default function ListCard({
     tipoPractica,
     canchaAsignada,
-    diasAsignados,
-    horarioInicio,
+    horarioAsignado,
     profesorAsignado,
+    precioAsignado,
     onDelete,
     onModify,
 }: ListCardProps) {
@@ -49,22 +49,22 @@ export default function ListCard({
                     <em>{canchaAsignada}</em>
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                    <em>Días asignados</em>
+                    <em>Días y Horario</em>
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                    <em>{diasAsignados}</em>
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    <em>Horario inicio</em>
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    <em>{horarioInicio}</em>
+                    <em>{horarioAsignado}</em>
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                     <em>Profesor asignado</em>
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                     <em>{profesorAsignado}</em>
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                    <em>Precio</em>
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                    <em>{precioAsignado}</em>
                 </Typography>
             </CardContent>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mr: 1 }}>

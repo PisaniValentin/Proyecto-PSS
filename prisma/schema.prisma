@@ -55,7 +55,7 @@ model Familia {
 model PracticaDeportiva {
     id            Int                    @id @default(autoincrement())
     deporte       TipoDeporte
-    canchaId      Int                    @unique
+    canchaId      Int
     fechaInicio   DateTime
     fechaFin      DateTime
     precio        Float
@@ -101,14 +101,14 @@ model InscripcionDeportiva {
 }
 
 model Cancha {
-    id           Int                @id @default(autoincrement())
+    id           Int                 @id @default(autoincrement())
     nombre       String
     tipoDeporte  TipoDeporte
     interior     Boolean
     capacidadMax Int
     precioHora   Float
     horarios     HorarioCancha[]
-    practica     PracticaDeportiva?
+    practica     PracticaDeportiva[]
     TurnoCancha  TurnoCancha[]
 }
 

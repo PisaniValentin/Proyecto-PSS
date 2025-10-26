@@ -1,25 +1,67 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Button, Container, List } from "@mui/material";
 import ListCard from "@/app/ui/components/practicaCard";
 import { useRouter } from "next/navigation";
 import ModalModificarPractica from "@/app/ui/components/modal/ModalModificarPractica";
 import ModalEliminarPractica from "@/app/ui/components/modal/ModalEliminarPractica";
+import { HorarioPractica, PracticaDeportiva } from "@/app/lib/types";
+import { DiaSemana } from "@prisma/client";
+
 
 export default function ListarPracticaDeportiva() {
     const router = useRouter();
 
     const [openModificar, setOpenModificar] = useState(false);
     const [openEliminar, setOpenEliminar] = useState(false);
+    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [practicas, setPracticas] = useState<PracticaDeportiva[]>([]);
+    const [selectedPractica, setSelectedPractica] = useState<PracticaDeportiva | null>(null);
 
-    const handleDelete = () => {
+
+    const fetchPracticas = async () => {
+        try {
+            const res = await fetch("/api/practicaDeportiva");
+            if (!res.ok) throw new Error("Error al obtener las prácticas");
+
+            const data = await res.json();
+            setPracticas(data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleDelete = (practica: PracticaDeportiva) => {
+        setSelectedPractica(practica);
         setOpenEliminar(true);
     };
 
-    const handleModify = () => {
+    const handleModify = (id: string) => {
+        setSelectedId(id);
         setOpenModificar(true);
     };
+
+    function formatHorarios(horarios: HorarioPractica[]): string {
+        const diasOrden: Record<DiaSemana, number> = {
+            LUNES: 1,
+            MARTES: 2,
+            MIERCOLES: 3,
+            JUEVES: 4,
+            VIERNES: 5,
+            SABADO: 6,
+            DOMINGO: 7,
+        };
+
+        return horarios
+            .sort((a, b) => diasOrden[a.dia] - diasOrden[b.dia])
+            .map((h) => `${h.dia} ${h.horaInicio} – ${h.horaFin}`)
+            .join(", ");
+    }
+
+    useEffect(() => {
+        fetchPracticas()
+    }, []);
 
     return (
         <Container maxWidth="lg" sx={{ mt: 4 }}>
@@ -37,42 +79,45 @@ export default function ListarPracticaDeportiva() {
                         gap: 2,
                     }}
                 >
-                    {Array.from({ length: 20 }).map((_, index) => (
-                        <li key={`section-${index}`}>
+                    {practicas.map((p) => (
+                        <li key={p.id}>
                             <ListCard
-                                key={index}
-                                tipoPractica="Cancha asignada"
-                                canchaAsignada={`Cancha ${index + 1}`}
-                                diasAsignados="Lunes, Miércoles"
-                                horarioInicio="10:00"
-                                profesorAsignado={`Prof. ${index + 1}`}
-                                onDelete={handleDelete}
-                                onModify={handleModify}
+                                key={p.id}
+                                tipoPractica={`${p.deporte}`}
+                                canchaAsignada={`${p.cancha.nombre}`}
+                                horarioAsignado={formatHorarios(p.horarios)}
+                                profesorAsignado={
+                                    p.entrenadores.map(
+                                        (e: any) => `${e.usuario?.nombre} ${e.usuario?.apellido}`
+                                    ).join(", ")
+                                }
+                                precioAsignado={p.precio}
+                                onDelete={() => handleDelete(p)}
+                                onModify={() => handleModify(String(p.id))}
                             />
                         </li>
                     ))}
                 </List>
 
-                {/* Modal de Modificación */}
                 <ModalModificarPractica
                     open={openModificar}
                     onClose={() => setOpenModificar(false)}
+                    id={selectedId ?? ""}
                 />
 
-                {/* Modal de Eliminación */}
                 <ModalEliminarPractica
                     open={openEliminar}
                     onClose={() => setOpenEliminar(false)}
                     onDelete={() => {
-                        console.log("Práctica eliminada");
                         setOpenEliminar(false);
                     }}
-                    deporte="Fútbol"
-                    fechaInicio="2025-10-10"
-                    fechaFin="2025-12-10"
-                    dias="Lunes, Miércoles"
-                    horarios="10:00 - 12:00"
-                    cancha="Cancha 1"
+                    selectedId={selectedPractica?.id.toString() ?? ""}
+                    deporte={selectedPractica?.deporte}
+                    fechaInicio={selectedPractica?.fechaInicio}
+                    fechaFin={selectedPractica?.fechaFin}
+                    dias={selectedPractica?.horarios.map(h => h.dia).join(", ")}
+                    horarios={selectedPractica ? formatHorarios(selectedPractica.horarios) : ""}
+                    cancha={selectedPractica?.cancha.nombre}
                 />
 
                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -93,3 +138,4 @@ export default function ListarPracticaDeportiva() {
         </Container>
     );
 }
+

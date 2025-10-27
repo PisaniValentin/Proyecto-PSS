@@ -11,7 +11,7 @@ import {
     MenuItem,
     CircularProgress,
 } from "@mui/material";
-import ModalExitoPractica from "./ModalExitoPractica";
+import ModalExitoPractica from "@/app/ui/components/modal/ModalExitoPractica";
 
 interface ModalModificarPracticaProps {
     open: boolean;
@@ -186,13 +186,22 @@ export default function ModalModificarPractica({ open, onClose, id }: ModalModif
                     <Button onClick={onClose} color="inherit">
                         Cancelar
                     </Button>
-                    <Button onClick={handleSubmit} variant="contained" color="primary">
+                    <Button
+                        onClick={handleSubmit}
+                        variant="contained"
+                        sx={{
+                            backgroundColor: "#222222",
+                            "&:hover": {
+                                backgroundColor: "#333333"
+                            },
+                        }}
+                    >
                         Guardar cambios
                     </Button>
                 </DialogActions>
             </Dialog>
 
-            <ModalExitoPractica open={openExito} onClose={() => setOpenExito(false)} />
+            <ModalExitoPractica open={openExito} onClose={() => setOpenExito(false)} opcion={"modificada"} />
         </>
     );
 }

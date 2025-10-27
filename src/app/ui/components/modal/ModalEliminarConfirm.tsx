@@ -1,6 +1,19 @@
 "use client";
+
 import React, { useState } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Typography, Button } from "@mui/material";
+import {
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Typography,
+    Button,
+    Box,
+    Divider,
+    Grid,
+} from "@mui/material";
+import ErrorIcon from '@mui/icons-material/ErrorOutlineOutlined';
+
 
 interface ModalEliminarConfirmProps {
     open: boolean;
@@ -22,16 +35,13 @@ export default function ModalEliminarConfirm({
     const Eliminar = async () => {
         setLoading(true);
         try {
+            const dni = usuario?.dni;
             let endpoint = "";
-            const dni = usuario.dni;
 
-            if (tipo === "Administrativo") {
-                endpoint = `/api/usuario/${dni}`;
-            } else if (tipo === "Entrenador") {
-                endpoint = `/api/entrenador/${dni}`;
-            } else if (tipo === "Socio") {
-                endpoint = `/api/socio/${dni}`;
-            } else {
+            if (tipo === "Administrativo") endpoint = `/api/usuario/${dni}`;
+            else if (tipo === "Entrenador") endpoint = `/api/entrenador/${dni}`;
+            else if (tipo === "Socio") endpoint = `/api/socio/${dni}`;
+            else {
                 console.error("Tipo de usuario no soportado");
                 setLoading(false);
                 return;
@@ -59,16 +69,126 @@ export default function ModalEliminarConfirm({
     };
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>Confirmar Eliminación</DialogTitle>
+        <Dialog
+            open={open}
+            onClose={onClose}
+            maxWidth="sm"
+            fullWidth
+            PaperProps={{
+                sx: {
+                    borderRadius: 3,
+                },
+            }}
+        >
+            <DialogTitle
+                sx={{
+                    textAlign: "center",
+                    bgcolor: "#d32f2f",
+                    color: "white",
+                    fontWeight: "bold",
+                    borderTopLeftRadius: 12,
+                    borderTopRightRadius: 12,
+                }}
+            >
+                <ErrorIcon sx={{
+                    verticalAlign: "middle",
+                    mr: 1,
+                    fontSize: 28,
+
+                }} />
+                Confirmar eliminación
+            </DialogTitle>
+
             <DialogContent dividers>
-                <Typography>
-                    ¿Está seguro que desea eliminar al {tipo ? tipo.toLowerCase() : "usuario"} {usuario?.nombre} {usuario?.apellido}?
+                <Typography variant="body1" textAlign="center" mb={2}>
+                    ¿Está seguro que desea eliminar al {tipo.toLowerCase()}{" "}
+                    <strong>{usuario?.nombre} {usuario?.apellido}</strong>?
                 </Typography>
+
+                <Divider sx={{ mb: 2 }} />
+
+                <Box
+                    sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 1.2,
+                        bgcolor: "#f9f9f9",
+                        p: 2,
+                        borderRadius: 2,
+                    }}
+                >
+                    <Box>
+                        <Typography variant="subtitle2" color="text.secondary">
+                            Nombre:
+                        </Typography>
+                        <Typography fontWeight="bold">{usuario?.nombre || "-"}</Typography>
+                    </Box>
+
+                    <Box>
+                        <Typography variant="subtitle2" color="text.secondary">
+                            Apellido:
+                        </Typography>
+                        <Typography fontWeight="bold">{usuario?.apellido || "-"}</Typography>
+                    </Box>
+
+                    <Box>
+                        <Typography variant="subtitle2" color="text.secondary">
+                            DNI:
+                        </Typography>
+                        <Typography fontWeight="bold">{usuario?.dni || "-"}</Typography>
+                    </Box>
+
+                    <Box>
+                        <Typography variant="subtitle2" color="text.secondary">
+                            Email:
+                        </Typography>
+                        <Typography fontWeight="bold">{usuario?.email || "-"}</Typography>
+                    </Box>
+
+                    <Box>
+                        <Typography variant="subtitle2" color="text.secondary">
+                            Teléfono:
+                        </Typography>
+                        <Typography fontWeight="bold">{usuario?.telefono || "-"}</Typography>
+                    </Box>
+
+                    <Box>
+                        <Typography variant="subtitle2" color="text.secondary">
+                            Rol:
+                        </Typography>
+                        <Typography fontWeight="bold" sx={{ color: "#d32f2f" }}>
+                            {usuario?.rol || tipo}
+                        </Typography>
+                    </Box>
+                </Box>
+
             </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose}>Cancelar</Button>
-                <Button variant="contained" color="error" onClick={Eliminar} disabled={loading}>
+
+            <DialogActions sx={{ justifyContent: "center", pt: 2 }}>
+                <Button
+                    onClick={onClose}
+                    sx={{
+                        color: "#333",
+                        border: "1px solid #ccc",
+                        px: 3,
+                        borderRadius: 2,
+                        "&:hover": { backgroundColor: "#f5f5f5" },
+                    }}
+                >
+                    Cancelar
+                </Button>
+                <Button
+                    variant="contained"
+                    color="error"
+                    onClick={Eliminar}
+                    disabled={loading}
+                    sx={{
+                        px: 4,
+                        borderRadius: 2,
+                        fontWeight: "bold",
+                        "&:hover": { backgroundColor: "#9a0007" },
+                    }}
+                >
                     {loading ? "Eliminando..." : "Eliminar"}
                 </Button>
             </DialogActions>

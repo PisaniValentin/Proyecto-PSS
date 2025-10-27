@@ -36,7 +36,7 @@ export default function AdminDashboard() {
                     <Card
                         sx={{
                             maxWidth: 400,
-                            backgroundColor: "#E7E7E7",
+                            backgroundColor: "#D4DFE2",
                             boxShadow: 3,
                             borderRadius: 3,
                         }}

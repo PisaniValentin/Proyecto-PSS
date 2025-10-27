@@ -2,12 +2,13 @@
 
 import React from "react";
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
     Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
     Typography,
+    Box,
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { useRouter } from "next/navigation";
@@ -15,15 +16,21 @@ import { useRouter } from "next/navigation";
 interface ModalExitoPracticaProps {
     open: boolean;
     onClose: () => void;
+    opcion: string;
 }
 
-export default function ModalExitoPractica({ open, onClose }: ModalExitoPracticaProps) {
-    const router = useRouter();
+export default function ModalExitoEliminarPractica({
+    open,
+    onClose,
+    opcion,
+}: ModalExitoPracticaProps) {
 
-    const handleAccept = () => {
+    const router = useRouter()
+
+    const handleClose = () => {
         onClose();
         router.push("/admin/practicas");
-    };
+    }
 
     return (
         <Dialog
@@ -46,16 +53,16 @@ export default function ModalExitoPractica({ open, onClose }: ModalExitoPractica
 
             <DialogContent sx={{ textAlign: "center" }}>
                 <Typography variant="h6" fontWeight="bold">
-                    ¡Práctica modificada con éxito!
+                    ¡Práctica {opcion} con éxito!
                 </Typography>
                 <Typography variant="body2" color="text.secondary" mt={1}>
-                    Los datos de la práctica deportiva se actualizaron correctamente.
+                    La práctica deportiva fue {opcion} correctamente del sistema.
                 </Typography>
             </DialogContent>
 
             <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
                 <Button
-                    onClick={handleAccept}
+                    onClick={handleClose}
                     variant="contained"
                     color="success"
                     sx={{ px: 4, borderRadius: 2 }}

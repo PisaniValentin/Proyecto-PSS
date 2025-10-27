@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Box, Button, Container, List } from "@mui/material";
+import { Box, Button, CircularProgress, Container, Fade, List, Typography } from "@mui/material";
 import ListCard from "@/app/ui/components/practicaCard";
 import { useRouter } from "next/navigation";
 import ModalModificarPractica from "@/app/ui/components/modal/ModalModificarPractica";
@@ -16,12 +16,13 @@ export default function ListarPracticaDeportiva() {
     const [openModificar, setOpenModificar] = useState(false);
     const [openEliminar, setOpenEliminar] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
-    const [practicas, setPracticas] = useState<PracticaDeportiva[]>([]);
     const [selectedPractica, setSelectedPractica] = useState<PracticaDeportiva | null>(null);
-
+    const [practicas, setPracticas] = useState<PracticaDeportiva[]>([]);
+    const [loading, setLoading] = useState(true);
 
     const fetchPracticas = async () => {
         try {
+            setLoading(true);
             const res = await fetch("/api/practicaDeportiva");
             if (!res.ok) throw new Error("Error al obtener las prácticas");
 
@@ -29,6 +30,8 @@ export default function ListarPracticaDeportiva() {
             setPracticas(data);
         } catch (error) {
             console.error(error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -66,38 +69,68 @@ export default function ListarPracticaDeportiva() {
     return (
         <Container maxWidth="lg" sx={{ mt: 4 }}>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                <List
-                    sx={{
-                        maxHeight: "70vh",
-                        overflowY: "auto",
-                        border: "1px solid #ccc",
-                        borderRadius: 2,
-                        padding: 2,
-                        boxSizing: "border-box",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 2,
-                    }}
-                >
-                    {practicas.map((p) => (
-                        <li key={p.id}>
-                            <ListCard
-                                key={p.id}
-                                tipoPractica={`${p.deporte}`}
-                                canchaAsignada={`${p.cancha.nombre}`}
-                                horarioAsignado={formatHorarios(p.horarios)}
-                                profesorAsignado={
-                                    p.entrenadores.map(
-                                        (e: any) => `${e.usuario?.nombre} ${e.usuario?.apellido}`
-                                    ).join(", ")
-                                }
-                                precioAsignado={p.precio}
-                                onDelete={() => handleDelete(p)}
-                                onModify={() => handleModify(String(p.id))}
-                            />
-                        </li>
-                    ))}
-                </List>
+                {loading ? (
+                    <Fade in={loading} timeout={500}>
+                        <Box
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                height: "60vh",
+                                gap: 2,
+                            }}
+                        >
+                            <CircularProgress size={60} thickness={4} />
+                            <Typography variant="h6" sx={{ color: "#555" }}>
+                                Cargando prácticas deportivas...
+                            </Typography>
+                        </Box>
+                    </Fade>
+                ) : (
+                    <Fade in={!loading} timeout={700}>
+                        <List
+                            sx={{
+                                maxHeight: "70vh",
+                                overflowY: "auto",
+                                border: "1px solid #ccc",
+                                borderRadius: 2,
+                                padding: 2,
+                                boxSizing: "border-box",
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: 2,
+                            }}
+                        >
+                            {practicas.length > 0 ? (
+                                practicas.map((p) => (
+                                    <li key={p.id}>
+                                        <ListCard
+                                            key={p.id}
+                                            id={p.id}
+                                            tipoPractica={`${p.deporte}`}
+                                            canchaAsignada={`${p.cancha.nombre}`}
+                                            horarioAsignado={formatHorarios(p.horarios)}
+                                            profesorAsignado={p.entrenadores
+                                                .map(
+                                                    (e: any) =>
+                                                        `${e.usuario?.nombre} ${e.usuario?.apellido}`
+                                                )
+                                                .join(", ")}
+                                            precioAsignado={p.precio}
+                                            onDelete={() => handleDelete(p)}
+                                            onModify={() => handleModify(String(p.id))}
+                                        />
+                                    </li>
+                                ))
+                            ) : (
+                                <Typography textAlign="center" sx={{ color: "#777", py: 4 }}>
+                                    No hay prácticas registradas.
+                                </Typography>
+                            )}
+                        </List>
+                    </Fade>
+                )}
 
                 <ModalModificarPractica
                     open={openModificar}
@@ -127,6 +160,9 @@ export default function ListarPracticaDeportiva() {
                         onClick={() => router.push("/admin")}
                         sx={{
                             backgroundColor: "#222222",
+                            "&:hover": {
+                                backgroundColor: "#000000"
+                            },
                             width: "30%",
                             height: "auto",
                         }}

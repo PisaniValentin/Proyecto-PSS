@@ -15,6 +15,7 @@ import {
     FormHelperText,
 } from "@mui/material";
 import { Entrenador, Cancha } from "@prisma/client";
+import ModalExitoEliminarPractica from "@/app/ui/components/modal/ModalExitoPractica";
 
 type EntrenadorConUsuario = Entrenador & {
     usuario: {
@@ -47,6 +48,8 @@ export default function AltaPracticaDeportiva() {
     const [entrenadores, setEntrenadores] = useState<EntrenadorConUsuario[]>([]);
     const [canchas, setCanchas] = useState<Cancha[]>([]);
     const [errores, setErrores] = useState<any>({});
+    const [openModalExito, setOpenModalExito] = useState(false);
+
 
     const fetchEntrenadores = async () => {
         try {
@@ -145,7 +148,8 @@ export default function AltaPracticaDeportiva() {
             setDeporte(""); setEntrenadorId(null); setCanchaId(null);
             setDiasSeleccionados([]); setInicio(""); setFin("");
             setFechaInicio(""); setFechaFin(""); setPrecio(""); setErrores({});
-            router.push("/admin/practicas");
+            setOpenModalExito(true);
+
         } catch (err) {
             console.error(err);
             alert("Ocurrió un error al guardar la práctica");
@@ -334,6 +338,11 @@ export default function AltaPracticaDeportiva() {
             >
                 Guardar
             </Button>
+            <ModalExitoEliminarPractica
+                open={openModalExito}
+                onClose={() => setOpenModalExito(false)}
+                opcion="creada"
+            />
         </Box>
     );
 }

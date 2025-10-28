@@ -27,7 +27,7 @@ export default function PracticaDeportivaAdmin() {
     return (
         <Box
             sx={{
-                minHeight: "100vh",
+                minHeight: "100%",
                 display: "flex",
                 justifyContent: "center",
                 bgcolor: "#f4f6f8",

@@ -1,37 +1,182 @@
+"use client";
+
 import Link from "next/link";
+import Image from "next/image";
+import {
+    Box,
+    Card,
+    CardActionArea,
+    CardContent,
+    Grid,
+    Typography,
+    Container,
+    Paper,
+} from "@mui/material";
 
 export default function OtrosPage() {
+    const opciones = [
+        {
+            titulo: "Canchas",
+            href: "/admin/otros/canchas",
+            color: {
+                bg: "linear-gradient(135deg, #EFF6FF, #DBEAFE)",
+                hover: "linear-gradient(135deg, #DBEAFE, #BFDBFE)",
+                text: "#1E3A8A",
+                border: "#BFDBFE",
+            },
+            icono: "/cancha_logo.webp",
+        },
+        {
+            titulo: "Perfil Usuario",
+            href: "/admin/otros/perfil",
+            color: {
+                bg: "linear-gradient(135deg, #F8FAFC, #E2E8F0)",
+                hover: "linear-gradient(135deg, #E2E8F0, #CBD5E1)",
+                text: "#334155",
+                border: "#CBD5E1",
+            },
+            icono: "/user.webp",
+        },
+        {
+            titulo: "Agenda de Turnos",
+            href: "/admin/otros/turnos",
+            color: {
+                bg: "linear-gradient(135deg, #ECFDF5, #D1FAE5)",
+                hover: "linear-gradient(135deg, #D1FAE5, #A7F3D0)",
+                text: "#065F46",
+                border: "#A7F3D0",
+            },
+            icono: "/turno.webp",
+        },
+    ];
+
     return (
-        <div className="min-h-screen bg-gray-50 px-4 py-6 md:px-10">
-            <div className="max-w-3xl mx-auto bg-white shadow-md rounded-xl border border-gray-200 p-6">
-                <h1 className="text-2xl font-semibold text-gray-900 mb-4">Otros</h1>
-                <p className="text-sm text-gray-600 mb-6">
-                    Elegí una opción para continuar
-                </p>
+        <Box
+            sx={{
+                minHeight: "100%",
+                background: "linear-gradient(to bottom, #F9FAFB, #F3F4F6)",
+                py: 8,
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <Link
-                        href="/admin/otros/canchas"
-                        className="inline-flex items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-700 px-4 py-3 text-sm font-medium hover:bg-blue-100 transition-colors"
-                    >
-                        Canchas
-                    </Link>
+            }}
+        >
+            <Container maxWidth="md">
+                <Paper
+                    elevation={4}
+                    sx={{
+                        borderRadius: 4,
+                        border: "1px solid #E5E7EB",
+                        paddingBottom: "2rem",
+                        backgroundColor: "white",
+                    }}
+                >
+                    <Typography
+                        variant="h5"
+                        textAlign="center"
+                        fontWeight={600}
+                        color="white"
+                        textTransform="uppercase"
+                        mb={1}
+                        sx={{
+                            textAlign: "center",
+                            pb: 1,
+                            borderTopLeftRadius: "1rem",
+                            borderTopRightRadius: "1rem",
+                            backgroundColor: "#1a222e",
+                            color: "white",
+                            width: "100%",
+                            py: 2,
 
-                    <Link
-                        href="/admin/otros/perfil"
-                        className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-800 px-4 py-3 text-sm font-medium hover:bg-slate-100 transition-colors"
+                        }}
                     >
-                        Ver perfil usuario
-                    </Link>
+                        Otros
+                    </Typography>
 
-                    <Link
-                        href="/admin/otros/turnos"
-                        className="inline-flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 px-4 py-3 text-sm font-medium hover:bg-emerald-100 transition-colors"
+                    <Typography
+                        variant="body1"
+                        textAlign="center"
+                        color="text.secondary"
+                        mt={2}
+                        mb={2}
                     >
-                        Agenda de turnos
-                    </Link>
-                </div>
-            </div>
-        </div>
+                        Elegí una opción para continuar
+                    </Typography>
+
+                    <Grid
+                        container
+                        spacing={4}
+                        justifyContent="center"
+
+                    >
+                        {opciones.map((op) => (
+                            <Grid key={op.titulo} >
+                                <Card
+                                    component={Link}
+                                    href={op.href}
+                                    sx={{
+                                        textDecoration: "none",
+                                        borderRadius: 3,
+                                        border: `1px solid ${op.color.border}`,
+                                        background: op.color.bg,
+                                        color: op.color.text,
+                                        height: "100%",
+                                        minHeight: 220,
+                                        aspectRatio: "1 / 1",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "center",
+                                        transition: "all 0.3s ease",
+                                        boxShadow: "0 3px 8px rgba(0,0,0,0.08)",
+                                        "&:hover": {
+                                            background: op.color.hover,
+                                            transform: "translateY(-5px)",
+                                            boxShadow: "0 8px 18px rgba(0,0,0,0.15)",
+                                        },
+                                    }}
+                                >
+                                    <CardActionArea
+                                        sx={{
+                                            height: "100%",
+                                            p: 3,
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                        }}
+                                    >
+                                        <Box
+                                            sx={{
+                                                width: 70,
+                                                height: 70,
+                                                mb: 2,
+                                                position: "relative",
+                                            }}
+                                        >
+                                            <Image
+                                                src={op.icono}
+                                                alt={op.titulo}
+                                                fill
+                                                style={{
+                                                    objectFit: "contain",
+                                                }}
+                                            />
+                                        </Box>
+                                        <CardContent sx={{ p: 0 }}>
+                                            <Typography
+                                                variant="subtitle1"
+                                                fontWeight={600}
+                                                textAlign="center"
+                                                color="inherit"
+                                            >
+                                                {op.titulo}
+                                            </Typography>
+                                        </CardContent>
+                                    </CardActionArea>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
+                </Paper>
+            </Container>
+        </Box>
     );
 }

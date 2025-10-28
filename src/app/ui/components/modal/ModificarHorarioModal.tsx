@@ -67,15 +67,12 @@ export default function ModalEditable({ open, onClose, onGuardar, cancha }: Moda
     const [fin, setFin] = useState<string>("");
     const [errores, setErrores] = useState<Errores>({});
 
-    // Precarga los horarios de la cancha seleccionada al abrir el modal
     useEffect(() => {
         if (open && cancha) {
             if (cancha.horarios.length > 0) {
-                // Obtiene todos los días de los horarios
                 const dias = cancha.horarios.map(h => h.diaSemana);
                 setDiasSeleccionados(dias);
 
-                // Opcional: setea el primer horario para inicio/fin
                 setInicio(cancha.horarios[0].horaInicio);
                 setFin(cancha.horarios[0].horaFin);
             } else {
@@ -148,15 +145,24 @@ export default function ModalEditable({ open, onClose, onGuardar, cancha }: Moda
     };
 
     return (
-        <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3, p: 2 } }}>
-            <DialogTitle sx={{ textAlign: "center", pb: 1 }}>
-                <Typography component="div" variant="h5" fontWeight="bold" textTransform="uppercase">
+        <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: "1rem" } }}>
+            <DialogTitle sx={{
+                textAlign: "center",
+                pb: 1,
+                borderTopLeftRadius: "1rem",
+                borderTopRightRadius: "1rem",
+                backgroundColor: "#1a222e",
+                color: "white",
+                width: "100%",
+                py: 2
+            }}>
+                <Typography component="div" variant="h6" fontWeight="bold" textTransform="uppercase" color="white" bgcolor={"#1a222e"}>
                     Editar Horarios
                 </Typography>
             </DialogTitle>
 
             <DialogContent>
-                <Typography variant="h6" gutterBottom>Días</Typography>
+                <Typography variant="h6" gutterBottom sx={{ p: 2 }}>Días</Typography>
                 <Box sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap" }}>
                     {days.map(day => (
                         <Button
@@ -185,7 +191,7 @@ export default function ModalEditable({ open, onClose, onGuardar, cancha }: Moda
                 </Box>
                 {errores.diasSeleccionados && <Typography color="error" variant="body2" sx={{ mb: 2 }}>{errores.diasSeleccionados}</Typography>}
 
-                <Typography variant="h6" gutterBottom>Horarios</Typography>
+                <Typography variant="h6" gutterBottom sx={{ p: 2 }}>Horarios</Typography>
                 <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
                     <FormControl fullWidth error={!!errores.inicio}>
                         <InputLabel>Inicio</InputLabel>

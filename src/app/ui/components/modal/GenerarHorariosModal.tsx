@@ -116,14 +116,23 @@ export default function GenerarHorariosModal({ open, onClose, onGuardar }: Gener
         <Dialog
             open={open}
             onClose={handleClose}
-            maxWidth="sm"
+            maxWidth="md"
             fullWidth
-            PaperProps={{ sx: { borderRadius: 3, p: 2 } }}
+            PaperProps={{ sx: { borderRadius: "1rem" } }}
         >
-            <DialogTitle sx={{ textAlign: "center", pb: 1 }}>
+            <DialogTitle sx={{
+                textAlign: "center",
+                pb: 1,
+                borderTopLeftRadius: "1rem",
+                borderTopRightRadius: "1rem",
+                backgroundColor: "#1a222e",
+                color: "white",
+                width: "100%",
+                py: 2
+            }}>
                 <Typography
                     component="div"
-                    variant="h5"
+                    variant="h6"
                     fontWeight="bold"
                     textTransform="uppercase">
                     Generar Horarios
@@ -131,8 +140,8 @@ export default function GenerarHorariosModal({ open, onClose, onGuardar }: Gener
             </DialogTitle>
 
             <DialogContent>
-                <Typography variant="h6" gutterBottom>Días</Typography>
-                <Box sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap" }}>
+                <Typography variant="h6" gutterBottom sx={{ p: 2 }}>Días</Typography>
+                <Box sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap", }}>
                     {days.map((day) => (
                         <Button
                             key={day}
@@ -170,7 +179,7 @@ export default function GenerarHorariosModal({ open, onClose, onGuardar }: Gener
                 {errores.diasSeleccionados && <Typography color="error" variant="body2" sx={{ mb: 2 }}>{errores.diasSeleccionados}</Typography>}
 
 
-                <Typography variant="h6" gutterBottom>Horarios</Typography>
+                <Typography variant="h6" gutterBottom sx={{ p: 2 }}>Horarios</Typography>
                 <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
                     <FormControl fullWidth error={!!errores.inicio}>
                         <InputLabel>Inicio</InputLabel>

@@ -51,6 +51,7 @@ export interface PracticaDeportiva {
     fechaFin: string;
     precio: number;
     horarios: HorarioPractica[];
+    inscripciones: InscripcionDeportiva[];
     entrenadores: Entrenador[];
     cancha: Cancha;
 }

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PracticaDeportiva, InscripcionDeportiva } from "@/app/lib/types";
 import { signOut } from "next-auth/react";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -13,27 +13,93 @@ export default function Page() {
   >([]);
   const [misPracticas, setmisPracticas] = useState<InscripcionDeportiva[]>([]);
 
-  const getMisPracticas = async () => {
-    setModo("MIS_PRACTICAS");
-    console.log("DNI del socio:", session?.user.dni);
-    const res = await fetch(`/api/socio/${session?.user.dni}`);
-    if (!res.ok) {
-      throw new Error(`Error HTTP ${res.status}`);
-    }
-    const data = await res.json();
-    console.log("Inscripciones deportivas del socio:", data.inscripciones);
-    setmisPracticas(data.inscripciones);
-  };
+  // useEffect(() => {
+  //   const inicializarMisPracticas = async () => {
+  //     setModo("MIS_PRACTICAS");
+  //     const res = await fetch(`/api/socio/${session?.user.dni}`);
+  //     if (!res.ok) {
+  //       throw new Error(`Error HTTP ${res.status}`);
+  //     }
+  //     const data = await res.json();
+  //     setmisPracticas(data.inscripciones);
+  //   };
 
-  const getInscribirme = async () => {
-    setModo("INSCRIBIRME");
-    const res = await fetch("/api/practicaDeportiva");
-    if (!res.ok) {
-      throw new Error(`Error HTTP ${res.status}`);
+  //   const inicializarInscripciones = async () => {
+  //     setModo("INSCRIBIRME");
+  //     const res = await fetch("/api/practicaDeportiva");
+  //     if (!res.ok) {
+  //       throw new Error(`Error HTTP ${res.status}`);
+  //     }
+  //     const data = await res.json();
+  //     setPracticasDeportivas(data);
+  //   };
+
+  //   if (session?.user) {
+  //     inicializarMisPracticas();
+  //     inicializarInscripciones();
+  //   }
+  // }, [[], session?.user]);
+
+  useEffect(() => {
+    // Definimos una función asíncrona principal
+    const inicializarDatos = async () => {
+      if (!session?.user?.dni) return; // Salir si no hay DNI
+
+      // 1. OBTENER AMBOS DATOS CONCURRENTEMENTE
+      try {
+        // Obtener inscripciones del usuario
+        const [resMisPracticas, resTodasPracticas] = await Promise.all([
+          fetch(`/api/socio/${session.user.dni}`),
+          fetch("/api/practicaDeportiva"),
+        ]);
+
+        // Manejo de errores
+        if (!resMisPracticas.ok)
+          throw new Error(
+            `Error al obtener inscripciones: ${resMisPracticas.status}`
+          );
+        if (!resTodasPracticas.ok)
+          throw new Error(
+            `Error al obtener todas las prácticas: ${resTodasPracticas.status}`
+          );
+
+        const dataMisPracticas = await resMisPracticas.json();
+        const dataTodasPracticas = await resTodasPracticas.json();
+
+        const inscripciones: InscripcionDeportiva[] =
+          dataMisPracticas.inscripciones || [];
+        const todasLasPracticas: PracticaDeportiva[] = dataTodasPracticas || [];
+
+        // 2. EXTRAER IDs de las prácticas ya inscritas
+        // Usamos un Set para una búsqueda O(1) mucho más rápida.
+        const idsInscritos = new Set(
+          inscripciones.map((inscripcion) => inscripcion.practicaId)
+        );
+
+        // 3. FILTRAR las prácticas disponibles
+        const practicasDisponibles = todasLasPracticas.filter(
+          (practica) =>
+            // Excluir la práctica si su ID se encuentra en el Set de inscritos
+            !idsInscritos.has(practica.id)
+        );
+
+        // 4. ESTABLECER LOS ESTADOS
+        setmisPracticas(inscripciones);
+        setPracticasDeportivas(practicasDisponibles);
+        // También puedes establecer el modo si es necesario:
+        // setModo("INSCRIBIRME");
+      } catch (error) {
+        console.error("Error al inicializar datos:", error);
+        // Manejar error (ej: setear estado de error, mostrar notificación)
+      }
+    };
+
+    if (session?.user) {
+      inicializarDatos();
     }
-    const data = await res.json();
-    setPracticasDeportivas(data);
-  };
+    // Dependencias: Ejecutar cuando cambie la sesión (al iniciar)
+  }, [misPracticas, session?.user]);
+
   return (
     <div className="h-screen">
       <header className="h-1/8 flex items-center justify-between px-14 bg-[#124559] w-full">
@@ -45,8 +111,8 @@ export default function Page() {
           <LogoutIcon />
         </button>
       </header>
-      <button onClick={getMisPracticas}>Mis practicas</button>
-      <button onClick={getInscribirme}>
+      <button onClick={() => setModo("MIS_PRACTICAS")}>Mis practicas</button>
+      <button onClick={() => setModo("INSCRIBIRME")}>
         Inscribirme a practicas deportivas
       </button>
       <button
@@ -65,7 +131,6 @@ export default function Page() {
               <div>Cancha: {practica.practica?.canchaId}</div>
               <div>Fecha Inicio: {practica.practica?.fechaInicio}</div>
               <div>Fecha Fin: {practica.practica?.fechaFin}</div>
-              <button>Inscribirme</button>
             </div>
           ))}
         </div>
@@ -78,8 +143,15 @@ export default function Page() {
               <div>Cancha: {practica.canchaId}</div>
               <div>Fecha Inicio: {practica.fechaInicio}</div>
               <div>Fecha Fin: {practica.fechaFin}</div>
-              <div>Capacidad: {practica.cancha.capacidadMax}</div>
-              <button>Inscribirme</button>
+              <div>
+                Capacidad: {practica.inscripciones.length} /{" "}
+                {practica.cancha.capacidadMax}
+              </div>
+              {practica.cancha.capacidadMax > practica.inscripciones.length && (
+                <button className="border p-1 rounded-2xl hover:scale-105 transition duration-300">
+                  Inscribirme
+                </button>
+              )}
             </div>
           ))}
         </div>

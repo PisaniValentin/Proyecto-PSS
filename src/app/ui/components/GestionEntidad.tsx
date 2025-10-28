@@ -8,6 +8,9 @@ import ModalModificar from "./modal/ModalModificar";
 import ModalEliminarConfirm from "./modal/ModalEliminarConfirm";
 import ModalExito from "./modal/ModalExito";
 import ModalError from "./modal/ModalError";
+import AddIcon from '@mui/icons-material/AddCircleRounded';
+import EditIcon from '@mui/icons-material/EditRounded';
+import DeleteIcon from '@mui/icons-material/DeleteForeverRounded';
 
 interface GestionEntidadProps {
   tipo: string;
@@ -77,28 +80,46 @@ export default function GestionEntidad({ tipo, onSuccess }: GestionEntidadProps)
         <Grid>
           <Button
             variant="contained"
-            color="primary"
             onClick={() => handleOpen("crear")}
+            sx={{
+              color: "lightgreen",
+              backgroundColor: "#1A222E",
+              "&: hover": {
+                backgroundColor: "black"
+              }
+            }}
           >
-            Crear {tipo}
+            <AddIcon /> Crear {tipo}
           </Button>
         </Grid>
         <Grid>
           <Button
-            variant="outlined"
-            color="secondary"
+            variant="contained"
             onClick={() => handleOpen("modificar")}
+            sx={{
+              color: "#F1FF5C",
+              backgroundColor: "#1A222E",
+              "&: hover": {
+                backgroundColor: "black"
+              }
+            }}
           >
-            Modificar {tipo}
+            <EditIcon fontSize="small" /> Modificar {tipo}
           </Button>
         </Grid>
         <Grid>
           <Button
-            variant="outlined"
-            color="error"
+            variant="contained"
             onClick={() => handleOpen("eliminar")}
+            sx={{
+              color: "crimson",
+              backgroundColor: "#1A222E",
+              "&: hover": {
+                backgroundColor: "black"
+              }
+            }}
           >
-            Eliminar {tipo}
+            <DeleteIcon fontSize="small" />Eliminar {tipo}
           </Button>
         </Grid>
       </Grid>

@@ -66,7 +66,7 @@ export default function ModalBuscarDNI({
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>{eliminar ? `Eliminar ${tipo}` : `Modificar ${tipo}`}</DialogTitle>
+            <DialogTitle textAlign={"center"} bgcolor={"#222222"} color="white">{eliminar ? `Eliminar ${tipo}` : `Modificar ${tipo}`}</DialogTitle>
             <DialogContent dividers>
                 <Typography sx={{ mb: 2 }}>
                     Ingrese el DNI del {tipo ? tipo.toLowerCase() : "usuario"} que desea{" "}
@@ -86,11 +86,24 @@ export default function ModalBuscarDNI({
                 />
             </DialogContent>
             <DialogActions>
-                <Button onClick={limpiarCampos}>Cancelar</Button>
+                <Button
+                    onClick={limpiarCampos}
+                    sx={{ color: "#222222" }}
+                >
+                    Cancelar
+                </Button>
                 <Button
                     variant="contained"
-                    color={eliminar ? "error" : "secondary"}
                     onClick={handleBuscar}
+                    sx={{
+                        backgroundColor: eliminar ? "#d32f2f" : "#FBC02D",
+                        color: eliminar ? "white" : "black",
+                        borderRadius: 2,
+                        px: 3,
+                        "&:hover": {
+                            backgroundColor: eliminar ? "#b71c1c" : "#F9A825",
+                        },
+                    }}
                 >
                     Buscar
                 </Button>

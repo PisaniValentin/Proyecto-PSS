@@ -86,31 +86,71 @@ export default function ListaUsuarios({ tipo, reload }: Props) {
         );
 
     return (
-        <TableContainer component={Paper} elevation={3}>
+        <TableContainer
+            component={Paper}
+            elevation={4}
+            sx={{
+                borderRadius: 3,
+                overflow: "hidden",
+                boxShadow: "0px 4px 15px rgba(0,0,0,0.1)",
+            }}
+        >
             <Table>
                 <TableHead>
-                    <TableRow>
-                        <TableCell><strong>Nombre</strong></TableCell>
-                        <TableCell><strong>Apellido</strong></TableCell>
-                        <TableCell><strong>DNI</strong></TableCell>
-                        <TableCell><strong>Email</strong></TableCell>
-                        <TableCell><strong>Teléfono</strong></TableCell>
-                        <TableCell><strong>Rol</strong></TableCell>
+                    <TableRow
+                        sx={{
+                            backgroundColor: "#1A222E",
+                        }}
+                    >
+                        {["Nombre", "Apellido", "DNI", "Email", "Teléfono", "Rol"].map((header) => (
+                            <TableCell
+                                key={header}
+                                sx={{
+                                    color: "#fff",
+                                    fontWeight: "bold",
+                                    textAlign: "center",
+                                    fontSize: "0.95rem",
+                                }}
+                            >
+                                {header}
+                            </TableCell>
+                        ))}
                     </TableRow>
                 </TableHead>
+
                 <TableBody>
-                    {usuarios.map((u) => (
-                        <TableRow key={u.id}>
-                            <TableCell>{u.nombre}</TableCell>
-                            <TableCell>{u.apellido}</TableCell>
-                            <TableCell>{u.dni}</TableCell>
-                            <TableCell>{u.email}</TableCell>
-                            <TableCell>{u.telefono || "-"}</TableCell>
-                            <TableCell>{u.rol}</TableCell>
+                    {usuarios.map((u, index) => (
+                        <TableRow
+                            key={u.id}
+                            sx={{
+                                backgroundColor: index % 2 === 0 ? "#CDD9EA" : "#ffffff",
+                                "&:hover": {
+                                    backgroundColor: "#e3f2fd",
+                                    cursor: "pointer",
+                                },
+                                transition: "background-color 0.2s ease",
+                            }}
+                        >
+                            <TableCell align="center">{u.nombre}</TableCell>
+                            <TableCell align="center">{u.apellido}</TableCell>
+                            <TableCell align="center">{u.dni}</TableCell>
+                            <TableCell align="center">{u.email}</TableCell>
+                            <TableCell align="center">{u.telefono || "-"}</TableCell>
+                            <TableCell align="center">
+                                <strong
+                                    style={{
+                                        color: "#0288d1"
+
+                                    }}
+                                >
+                                    {u.rol}
+                                </strong>
+                            </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
             </Table>
         </TableContainer>
+
     );
 }

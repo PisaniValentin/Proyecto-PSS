@@ -1,3 +1,5 @@
+import { TipoDeporte, DiaSemana } from "@prisma/client"
+
 export interface UsuarioBase {
     id: number;
     nombre: string;
@@ -43,22 +45,21 @@ export interface Familia {
 
 export interface PracticaDeportiva {
     id: number;
-    deporte: "FUTBOL" | "BASQUET" | "NATACION" | "HANDBALL";
+    deporte: TipoDeporte;
+    canchaId: number;
+    fechaInicio: string;
+    fechaFin: string;
     precio: number;
-    entrenadores?: Entrenador[];
-    horarios?: HorarioPractica[];
-    inscripciones?: InscripcionDeportiva[];
-    asistencias?: Asistencia[];
+    horarios: HorarioPractica[];
+    entrenadores: Entrenador[];
+    cancha: Cancha;
 }
 
 export interface HorarioPractica {
     id: number;
-    practicaId: number;
-    fecha?: Date;
-    horaInicio: Date;
-    horaFin: Date;
-    turnoId?: number;
-    turno?: TurnoCancha;
+    dia: DiaSemana;
+    horaInicio: string;
+    horaFin: string;
 }
 
 export interface Cancha {

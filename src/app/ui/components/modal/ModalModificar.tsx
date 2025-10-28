@@ -116,7 +116,7 @@ export default function ModalModificar({
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>Modificar {tipo}</DialogTitle>
+            <DialogTitle textAlign={"center"} bgcolor={"#222222"} color="white">Modificar {tipo}</DialogTitle>
             <DialogContent dividers>
                 <Grid container direction="column" spacing={2}>
                     <Grid>
@@ -199,8 +199,25 @@ export default function ModalModificar({
                 </Grid>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Cancelar</Button>
-                <Button variant="contained" color="secondary" onClick={Guardar} disabled={loading}>
+                <Button
+                    onClick={onClose}
+                    sx={{ color: "#222222" }}
+                >
+                    Cancelar
+                </Button>
+                <Button
+                    variant="contained"
+                    onClick={Guardar}
+                    sx={{
+                        backgroundColor: "#FBC02D",
+                        color: "black",
+                        borderRadius: 2,
+                        px: 3,
+                        "&:hover": {
+                            backgroundColor: "#F9A825",
+                        },
+                    }}
+                    disabled={loading}>
                     {loading ? "Guardando..." : "Guardar Cambios"}
                 </Button>
             </DialogActions>

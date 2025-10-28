@@ -3,21 +3,23 @@
 import { Box, Button, Card, CardContent, Typography } from "@mui/material";
 
 interface ListCardProps {
+    id: number;
     tipoPractica: string;
     canchaAsignada: string;
-    diasAsignados: string;
-    horarioInicio: string;
+    horarioAsignado: string;
     profesorAsignado: string;
+    precioAsignado: number;
     onDelete: () => void;
     onModify: () => void;
 }
 
 export default function ListCard({
+    id,
     tipoPractica,
     canchaAsignada,
-    diasAsignados,
-    horarioInicio,
+    horarioAsignado,
     profesorAsignado,
+    precioAsignado,
     onDelete,
     onModify,
 }: ListCardProps) {
@@ -30,6 +32,7 @@ export default function ListCard({
                 padding: 1,
                 border: 1,
                 borderColor: "silver",
+                backgroundColor: "#DDE4F0",
                 borderRadius: 2,
                 boxShadow: 1,
                 mb: 2,
@@ -37,46 +40,56 @@ export default function ListCard({
         >
             <CardContent >
                 <Typography variant="subtitle1" gutterBottom>
-                    <strong>Tipo práctica deportiva</strong>
+                    <strong>Práctica deportiva PD - {id}</strong>
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.primary">
+                    <strong>Deporte:</strong>
+                </Typography>
+                <Typography variant="body2" color="text.secondary" pl={2}>
                     <em>{tipoPractica}</em>
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    <em>Cancha asignada</em>
+                <Typography variant="body2" color="text.primary">
+                    <strong>Cancha asignada</strong>
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" pl={2}>
                     <em>{canchaAsignada}</em>
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    <em>Días asignados</em>
+                <Typography variant="body2" color="text.primary">
+                    <strong>Días y Horario</strong>
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    <em>{diasAsignados}</em>
+
+                <Box sx={{ pl: 2 }} component="div" color="text.secondary">
+                    {horarioAsignado
+                        ? horarioAsignado.split(/[,;]+/).map((h, i) => (
+                            <Typography key={i} variant="body2">
+                                {h.trim()}
+                            </Typography>
+                        ))
+                        : <Typography variant="body2">&lt;Sin horarios&gt;</Typography>}
+                </Box>
+                <Typography variant="body2" color="text.primary">
+                    <strong>Profesor asignado</strong>
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    <em>Horario inicio</em>
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    <em>{horarioInicio}</em>
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    <em>Profesor asignado</em>
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" pl={2}>
                     <em>{profesorAsignado}</em>
                 </Typography>
+                <Typography variant="body2" color="text.primary">
+                    <strong>Precio</strong>
+                </Typography>
+                <Typography variant="body2" color="text.secondary" pl={2}>
+                    <em>${precioAsignado}</em>
+                </Typography>
             </CardContent>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mr: 1 }}>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mr: 4 }}>
                 <Button
                     variant="contained"
                     onClick={onDelete}
                     sx={{
                         minWidth: "100px",
                         height: "40px",
-                        backgroundColor: "#FF2A00",
+                        backgroundColor: "#D32F2F",
                         '&:hover': {
-                            backgroundColor: '#FF512E',
+                            backgroundColor: '#B71C1C',
                         },
                         fontWeight: "bold",
 
@@ -90,9 +103,9 @@ export default function ListCard({
                     sx={{
                         minWidth: "100px",
                         height: "40px",
-                        backgroundColor: "gold",
+                        backgroundColor: "#FBC02D",
                         '&:hover': {
-                            backgroundColor: 'yellow',
+                            backgroundColor: '#F9A825',
                         },
                         color: "black",
                         fontWeight: "bold",

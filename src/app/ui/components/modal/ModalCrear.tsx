@@ -119,7 +119,7 @@ export default function ModalCrear<T extends UsuarioBase>({ open, onClose, tipo,
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>Crear {tipo}</DialogTitle>
+            <DialogTitle textAlign={"center"} bgcolor={"#222222"} color="white" fontWeight={"bold"} >Crear {tipo}</DialogTitle>
             <DialogContent dividers>
                 <Grid container direction="column" spacing={2}>
                     <Grid>
@@ -226,11 +226,27 @@ export default function ModalCrear<T extends UsuarioBase>({ open, onClose, tipo,
                 </Grid>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleClose}>Cancelar</Button>
-                <Button variant="contained" color="primary" onClick={crearUsuario} disabled={loading}>
+                <Button
+                    onClick={handleClose}
+                    sx={{ color: "#222222" }}
+                >
+                    Cancelar
+                </Button>
+                <Button
+                    variant="contained"
+                    onClick={crearUsuario}
+                    disabled={loading}
+                    sx={{
+                        color: "white",
+                        backgroundColor: "#2E8B57",
+                        "&: hover": {
+                            backgroundColor: "#1D5837"
+                        }
+                    }}
+                >
                     {loading ? "Creando..." : "Crear"}
                 </Button>
             </DialogActions>
-        </Dialog>
+        </Dialog >
     );
 }

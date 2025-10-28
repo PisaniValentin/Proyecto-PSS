@@ -91,6 +91,10 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
             data: { entrenadores: { set: [] } },
         });
 
+        await prisma.horarioPractica.deleteMany({
+            where: { practicaId: Number(id) },
+        });
+
         await prisma.practicaDeportiva.delete({ where: { id: Number(id) } });
 
         return NextResponse.json({ message: "Práctica deportiva eliminada correctamente" }, { status: 200 });

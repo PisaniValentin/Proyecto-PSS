@@ -22,7 +22,7 @@ export default function Page() {
 
     return (
         <div className="flex h-screen bg-[#F3F4F6]">
-            <div className="flex-1 flex flex-col overflow-auto rounded-2xl border-2 border-indigo-600">
+            <div className="flex-1 flex flex-col overflow-auto rounded-2xl border-2 border-[#2A384B]">
                 <Box className="p-8">
                     <Typography
                         variant="h5"
@@ -41,9 +41,17 @@ export default function Page() {
                     <Tabs
                         value={tab}
                         onChange={handleTabChange}
-                        textColor="primary"
-                        indicatorColor="primary"
-                        sx={{ mb: 3 }}
+                        sx={{
+                            "& .MuiTabs-indicator": {
+                                backgroundColor: "#2A384B",
+                            },
+                            "& .MuiTab-root": {
+                                color: "#555",
+                                "&.Mui-selected": {
+                                    color: "#2A384B",
+                                },
+                            },
+                        }}
                     >
                         <Tab label="Administrativos" />
                         <Tab label="Socios" />

@@ -13,14 +13,14 @@ export default function PracticaDeportivaAdmin() {
             description: "Crear una nueva práctica deportiva en el sistema.",
             iconSrc: "/add.png",
             onClick: () => router.push("/admin/practicas/alta"),
-            gradient: "linear-gradient(135deg, #28a745 0%, #85d98c 100%)", // verde elegante
+            gradient: "linear-gradient(135deg, #28a745 0%, #85d98c 100%)",
         },
         {
             title: "Listar Prácticas Deportivas",
             description: "Ver y administrar todas las prácticas deportivas.",
             iconSrc: "/sports.png",
             onClick: () => router.push("/admin/practicas/listar"),
-            gradient: "linear-gradient(135deg, #0d6efd 0%, #6ea0ff 100%)", // azul profesional
+            gradient: "linear-gradient(135deg, #0d6efd 0%, #6ea0ff 100%)",
         },
     ];
 

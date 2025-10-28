@@ -24,7 +24,15 @@ interface PracticaForm {
     canchaId: number | "";
     fechaInicio: string;
     fechaFin: string;
-    precio: number;
+    precio: number | "";
+}
+
+interface FormErrors {
+    deporte?: string;
+    canchaId?: string;
+    fechaInicio?: string;
+    fechaFin?: string;
+    precio?: string;
 }
 
 export default function ModalModificarPractica({ open, onClose, id }: ModalModificarPracticaProps) {
@@ -33,8 +41,9 @@ export default function ModalModificarPractica({ open, onClose, id }: ModalModif
         canchaId: "",
         fechaInicio: "",
         fechaFin: "",
-        precio: 0,
+        precio: "",
     });
+    const [errors, setErrors] = useState<FormErrors>({});
     const [loading, setLoading] = useState(false);
     const [openExito, setOpenExito] = useState(false);
     const [canchas, setCanchas] = useState<{ id: number; nombre: string }[]>([]);
@@ -60,7 +69,7 @@ export default function ModalModificarPractica({ open, onClose, id }: ModalModif
                     fechaFin: practica.fechaFin
                         ? new Date(practica.fechaFin).toISOString().split("T")[0]
                         : "",
-                    precio: practica.precio || 0,
+                    precio: practica.precio || "",
                 });
 
                 setCanchas(listaCanchas);
@@ -74,26 +83,67 @@ export default function ModalModificarPractica({ open, onClose, id }: ModalModif
         fetchData();
     }, [open, id]);
 
+    const validateField = (name: string, value: any): string | undefined => {
+        switch (name) {
+            case "deporte":
+                if (!value.trim()) return "El deporte es obligatorio.";
+                break;
+            case "canchaId":
+                if (!value) return "Debe seleccionar una cancha.";
+                break;
+            case "fechaInicio":
+                if (!value) return "Debe ingresar la fecha de inicio.";
+                break;
+            case "fechaFin":
+                if (!value) return "Debe ingresar la fecha de finalización.";
+                break;
+            case "precio":
+                if (value === "" || value === null) return "Debe ingresar un precio.";
+                if (Number(value) <= 0) return "El precio debe ser mayor que cero.";
+                break;
+        }
+        return undefined;
+    };
+
+    const validateForm = (): boolean => {
+        const newErrors: FormErrors = {};
+        Object.keys(formData).forEach((key) => {
+            const field = key as keyof PracticaForm;
+            const error = validateField(field, formData[field]);
+            if (error) newErrors[field] = error;
+        });
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
+        const parsedValue = name === "precio" ? Number(value) : value;
+
         setFormData((prev) => ({
             ...prev,
-            [name]: name === "precio" ? Number(value) : value,
+            [name]: parsedValue,
+        }));
+    };
+
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        const error = validateField(name, value);
+        setErrors((prev) => ({
+            ...prev,
+            [name]: error,
         }));
     };
 
     const handleSubmit = async () => {
+        if (!validateForm()) return;
+
         try {
             const res = await fetch(`/api/practicaDeportiva/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    deporte: formData.deporte,
-                    canchaId: formData.canchaId,
-                    fechaInicio: formData.fechaInicio,
-                    fechaFin: formData.fechaFin,
-                    precio: formData.precio,
-                }),
+                body: JSON.stringify(formData),
             });
 
             if (!res.ok) throw new Error("Error al actualizar la práctica");
@@ -119,13 +169,16 @@ export default function ModalModificarPractica({ open, onClose, id }: ModalModif
     return (
         <>
             <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-                <DialogTitle>Modificar práctica deportiva</DialogTitle>
+                <DialogTitle textAlign={"center"} bgcolor={"#222222"} color={"white"}>Modificar práctica deportiva</DialogTitle>
                 <DialogContent>
                     <TextField
                         label="Deporte"
                         name="deporte"
                         value={formData.deporte}
                         onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={Boolean(errors.deporte)}
+                        helperText={errors.deporte}
                         fullWidth
                         margin="normal"
                         variant="outlined"
@@ -137,6 +190,9 @@ export default function ModalModificarPractica({ open, onClose, id }: ModalModif
                         name="canchaId"
                         value={formData.canchaId}
                         onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={Boolean(errors.canchaId)}
+                        helperText={errors.canchaId}
                         fullWidth
                         margin="normal"
                         variant="outlined"
@@ -155,6 +211,9 @@ export default function ModalModificarPractica({ open, onClose, id }: ModalModif
                         type="date"
                         value={formData.fechaInicio}
                         onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={Boolean(errors.fechaInicio)}
+                        helperText={errors.fechaInicio}
                         fullWidth
                         margin="normal"
                         InputLabelProps={{ shrink: true }}
@@ -166,6 +225,9 @@ export default function ModalModificarPractica({ open, onClose, id }: ModalModif
                         type="date"
                         value={formData.fechaFin}
                         onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={Boolean(errors.fechaFin)}
+                        helperText={errors.fechaFin}
                         fullWidth
                         margin="normal"
                         InputLabelProps={{ shrink: true }}
@@ -177,6 +239,9 @@ export default function ModalModificarPractica({ open, onClose, id }: ModalModif
                         type="number"
                         value={formData.precio}
                         onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={Boolean(errors.precio)}
+                        helperText={errors.precio}
                         fullWidth
                         margin="normal"
                     />
@@ -190,10 +255,8 @@ export default function ModalModificarPractica({ open, onClose, id }: ModalModif
                         onClick={handleSubmit}
                         variant="contained"
                         sx={{
-                            backgroundColor: "#222222",
-                            "&:hover": {
-                                backgroundColor: "#333333"
-                            },
+                            backgroundColor: "#222",
+                            "&:hover": { backgroundColor: "#333" },
                         }}
                     >
                         Guardar cambios
@@ -201,7 +264,7 @@ export default function ModalModificarPractica({ open, onClose, id }: ModalModif
                 </DialogActions>
             </Dialog>
 
-            <ModalExitoPractica open={openExito} onClose={() => setOpenExito(false)} opcion={"modificada"} />
+            <ModalExitoPractica open={openExito} onClose={() => setOpenExito(false)} opcion="modificada" />
         </>
     );
 }

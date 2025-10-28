@@ -37,8 +37,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     try {
         const body = await req.json();
-        const { nombre, tipoDeporte, interior, capacidadMax, precioHora } =
-            body;
+        const { nombre, tipoDeporte, interior, capacidadMax, precioHora, horarios } = body;
 
         const canchaExistente = await prisma.cancha.findUnique({
             where: { id: canchaId },
@@ -74,17 +73,33 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
                         ? Number(precioHora)
                         : canchaExistente.precioHora,
             },
-            include: {
-                horarios: true,
-                TurnoCancha: true,
-            },
         });
 
-        return NextResponse.json(canchaActualizada, { status: 200 })
+        if (Array.isArray(horarios)) {
+            await prisma.horarioCancha.deleteMany({ where: { canchaId } });
+
+            const horariosNuevos = horarios.map((h: any) => ({
+                canchaId,
+                diaSemana: h.diaSemana,
+                horaInicio: h.horaInicio,
+                horaFin: h.horaFin,
+            }));
+
+            await prisma.horarioCancha.createMany({ data: horariosNuevos });
+        }
+
+        const canchaConHorarios = await prisma.cancha.findUnique({
+            where: { id: canchaId },
+            include: { horarios: true, TurnoCancha: true },
+        });
+
+        return NextResponse.json(canchaConHorarios, { status: 200 });
     } catch (error) {
-        return NextResponse.json({ error: 'Error al modificar una cancha' }, { status: 500 })
+        console.error(error);
+        return NextResponse.json({ error: 'Error al modificar una cancha' }, { status: 500 });
     }
 }
+
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -99,6 +114,10 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
         if (!canchaExistente) {
             return NextResponse.json({ error: 'Cancha no encontrada' }, { status: 404 })
         }
+
+        await prisma.horarioCancha.deleteMany({ where: { canchaId } });
+        await prisma.turnoCancha.deleteMany({ where: { canchaId } });
+
         await prisma.cancha.delete({ where: { id: canchaId } })
         return NextResponse.json({ message: "Cancha eliminada correctamente" }, { status: 200 });
     } catch (error) {

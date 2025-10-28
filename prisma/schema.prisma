@@ -76,14 +76,16 @@ model HorarioPractica {
 }
 
 model TurnoCancha {
-    id         Int              @id @default(autoincrement())
-    canchaId   Int
-    fecha      DateTime
-    horaInicio String
-    horaFin    String
-    disponible Boolean          @default(true)
-    alquiler   AlquilerCancha[]
-    cancha     Cancha           @relation(fields: [canchaId], references: [id])
+    id          Int              @id @default(autoincrement())
+    canchaId    Int
+    fecha       DateTime
+    horaInicio  String
+    horaFin     String
+    estado      EstadoTurno      @default(LIBRE)
+    titularId   Int?
+    titularTipo String?
+    alquiler    AlquilerCancha[]
+    cancha      Cancha           @relation(fields: [canchaId], references: [id])
 
     @@unique([canchaId, fecha, horaInicio])
 }
@@ -120,6 +122,8 @@ model HorarioCancha {
     horaFin    String
     disponible Boolean   @default(true)
     cancha     Cancha    @relation(fields: [canchaId], references: [id])
+
+    @@unique([canchaId, diaSemana])
 }
 
 model AlquilerCancha {
@@ -252,7 +256,9 @@ enum DiaSemana {
     DOMINGO
 }
 
-enum MetodoNotificacion {
-    EMAIL
-    APP
+enum EstadoTurno {
+    LIBRE
+    ALQUILADO
+    PRACTICA_DEPORTIVA
+    MANTENIMIENTO
 }

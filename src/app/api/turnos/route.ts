@@ -20,6 +20,43 @@ function horaToMinutos(hora: string): number {
     return h * 60 + m;
 }
 
+export async function GET() {
+    try {
+        const turnos = await prisma.turnoCancha.findMany({
+            include: {
+                cancha: {
+                    include: {
+                        practica: {
+                            include: {
+                                entrenadores: {
+                                    include: { usuario: true },
+                                },
+                                horarios: true,
+                            },
+                        },
+                        horarios: true,
+                    },
+                },
+                alquiler: {
+                    include: {
+                        socio: {
+                            include: { usuario: true },
+                        },
+                    },
+                },
+            },
+        });
+
+        return NextResponse.json(turnos);
+    } catch (error) {
+        console.error("Error al obtener turnos:", error);
+        return NextResponse.json(
+            { error: "Error al obtener turnos" },
+            { status: 500 }
+        );
+    }
+}
+
 export async function POST(req: Request) {
     try {
         const { fechaInicio, fechaFin } = await req.json();

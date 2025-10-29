@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "TurnoCancha" ALTER COLUMN "fecha" SET DATA TYPE TIMESTAMP(0);

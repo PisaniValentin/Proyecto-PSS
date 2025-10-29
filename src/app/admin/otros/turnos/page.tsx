@@ -15,6 +15,13 @@ export default function TurnoPage() {
             onClick: () => router.push("/admin/otros/turnos/generar"),
             gradient: "linear-gradient(135deg, #28a745 0%, #85d98c 100%)",
         },
+        {
+            title: "Listar Turnos",
+            description: "Se listan turnos para todas las canchas en un rango de fechas",
+            iconSrc: "/form.png",
+            onClick: () => router.push("/admin/otros/turnos/listar"),
+            gradient: "linear-gradient(135deg, #28a745 0%, #85d98c 100%)",
+        },
     ];
 
     return (

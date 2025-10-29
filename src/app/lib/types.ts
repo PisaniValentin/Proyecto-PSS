@@ -21,6 +21,16 @@ export interface Entrenador extends UsuarioBase {
     actividadDeportiva: "FUTBOL" | "BASQUET" | "NATACION" | "HANDBALL";
     practica?: PracticaDeportiva[];
     asistencias?: Asistencia[];
+      usuario: {
+    id: number;
+    nombre: string;
+    apellido: string;
+    dni: string;
+    email: string;
+    telefono?: string;
+    rol: "ENTRENADOR";
+    fechaAlta: Date | string;
+  };
 }
 
 export interface Socio extends UsuarioBase {
@@ -51,6 +61,7 @@ export interface PracticaDeportiva {
     fechaFin: string;
     precio: number;
     horarios: HorarioPractica[];
+    inscripciones: InscripcionDeportiva[];
     entrenadores: Entrenador[];
     cancha: Cancha;
 }

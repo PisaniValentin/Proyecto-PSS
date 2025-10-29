@@ -28,7 +28,7 @@ export default function SocioPage() {
             alt="practica deportiva imagen"
           ></Image>
           <Link
-            href=""
+            href="socio/practicas-deportivas"
             className="bg-gray-900 text-white p-2 rounded-xl hover:scale-105 transition duration-300"
           >
             Practicas deportivas

@@ -8,6 +8,7 @@ export async function GET(_req: NextRequest) {
             include: {
                 cancha: true,
                 entrenadores: { include: { usuario: true } },
+                inscripciones: true,
                 horarios: true,
             },
         });

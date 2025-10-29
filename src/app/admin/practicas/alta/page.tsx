@@ -79,7 +79,7 @@ export default function AltaPracticaDeportiva() {
     }, []);
 
     const entrenadoresFiltrados = entrenadores.filter(
-        (e) => e.actividadDeportiva === deporte
+        (e: any) => e.actividadDeportiva === deporte
     );
 
     const horaFinOptions = inicio

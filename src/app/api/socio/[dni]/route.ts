@@ -9,20 +9,32 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ dni
         return NextResponse.json({ error: 'Falta o es inválido el dni del usuario' }, { status: 400 })
     }
     try {
-        const socio = await prisma.socio.findFirst({
-            where: { usuario: { dni } },
-            include: {
-                usuario: true,
-                familia: true,
-                pagos: true,
-                alquileres: true,
-                asistencias: true,
-                CuotaSocio: true,
-                inscripciones: {
-                    include: { practica: true },
-                },
+const socio = await prisma.socio.findFirst({
+  where: { usuario: { dni } },
+  include: {
+    usuario: true,
+    familia: true,
+    pagos: true,
+    alquileres: true,
+    asistencias: true,
+    CuotaSocio: true,
+    inscripciones: {
+      include: {
+        practica: {
+          include: {
+            entrenadores: {
+              include: {
+                usuario: true, 
+              },
             },
-        });
+            cancha: true,
+            horarios: true,
+          },
+        },
+      },
+    },
+  },
+});
 
         if (!socio) {
             return NextResponse.json({ error: "Socio no encontrado" }, { status: 404 });

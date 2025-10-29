@@ -4,23 +4,16 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { Box, Grid, Typography } from "@mui/material";
 
-export default function PracticaDeportivaAdmin() {
+export default function TurnoPage() {
     const router = useRouter();
 
     const cards = [
         {
-            title: "Alta Práctica Deportiva",
-            description: "Crear una nueva práctica deportiva en el sistema.",
+            title: "Generar Turnos",
+            description: "Se generar turnos libres para todas las canchas en un rango de fechas",
             iconSrc: "/add.png",
-            onClick: () => router.push("/admin/practicas/alta"),
+            onClick: () => router.push("/admin/otros/turnos/generar"),
             gradient: "linear-gradient(135deg, #28a745 0%, #85d98c 100%)",
-        },
-        {
-            title: "Listar Prácticas Deportivas",
-            description: "Ver y administrar todas las prácticas deportivas.",
-            iconSrc: "/sports.png",
-            onClick: () => router.push("/admin/practicas/listar"),
-            gradient: "linear-gradient(135deg, #0d6efd 0%, #6ea0ff 100%)",
         },
     ];
 

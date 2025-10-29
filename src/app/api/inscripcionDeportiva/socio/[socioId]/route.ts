@@ -2,11 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 
 export async function GET(
-  req: NextRequest,
-  { params }: { params: { socioId: string } }
+  _req: NextRequest,
+  { params }: { params: Promise<{ socioId: string }> }
 ) {
   try {
-    const { socioId } = params;
+    const { socioId } = await params;
+
+    if (!socioId) {
+      return NextResponse.json({ error: 'Falta o es inválido el socioId' }, { status: 400 })
+    }
 
     const inscripciones = await prisma.inscripcionDeportiva.findMany({
       where: { socioId: Number(socioId) },
